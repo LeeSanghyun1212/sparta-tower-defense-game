@@ -17,10 +17,10 @@ model Users {
   id         Int         @id @default(autoincrement())
   loginId    String      @unique
   password   String
-  nickname   String
+  nickname   String      @unique
   createdAt  DateTime       @default(now()) @map("created_date")
   updatedAt  DateTime?      @updatedAt @map("updated_date")
-  gaemdLogs  GameLog[]      @relation("UserGameLogs")
+  gameLogs  GameLog[]      @relation("UserGameLogs")
 }
 
 model GameLog {
