@@ -11,6 +11,7 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    //asdfasdfasdf
   }
 
   draw(ctx, towerImage) {
