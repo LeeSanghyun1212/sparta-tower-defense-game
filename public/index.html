@@ -31,6 +31,10 @@
         font-size: 16px;
         cursor: pointer;
       }
+      .upgrade-container {
+        display: none; /* 업그레이드 버튼을 기본적으로 숨김 */
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
@@ -41,6 +45,11 @@
       <button id="playButton">게임 플레이</button>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+    <div class="upgrade-container">
+      <button id="upgradeTowerButton">타워 업그레이드</button>
+    </div>
+
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
       document.getElementById('registerButton').addEventListener('click', () => {
@@ -54,7 +63,24 @@
       document.getElementById('playButton').addEventListener('click', () => {
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
+        document.querySelector('.upgrade-container').style.display = 'block';
         import('./src/game.js');
+      });
+
+      // 업그레이드 버튼 클릭 이벤트 처리
+      document.getElementById('upgradeTowerButton').addEventListener('click', () => {
+        if (selectedTower) {
+          // 선택된 타워가 있는 경우
+          if (userGold >= selectedTower.upgradeCost) {
+            selectedTower.upgrade(); // 타워 업그레이드
+            userGold -= selectedTower.upgradeCost; // 골드 차감
+            console.log(`타워 업그레이드 완료: 현재 레벨 ${selectedTower.towerLevel}`);
+          } else {
+            alert('골드가 부족하여 업그레이드할 수 없습니다!');
+          }
+        } else {
+          alert('업그레이드할 타워를 선택해주세요!');
+        }
       });
     </script>
   </body>
