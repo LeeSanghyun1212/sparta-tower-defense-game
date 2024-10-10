@@ -12,6 +12,7 @@ export class Tower {
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
     this.towerLevel = 1; //타워 레벨
+    this.upgradeCost = 50; //기본 업그레이드 비용
   }
 
   draw(ctx, towerImage) {
@@ -49,6 +50,7 @@ export class Tower {
       this.towerLevel++;
       this.attackPower += 10;
       this.range += 20;
+      this.upgradeCost += 20; // 업그레이드 비용 증가
     }
   }
 }
@@ -59,6 +61,7 @@ export class StrongSingleTower extends Tower {
     super(x, y, 100);
     this.attackPower = 80; // 강력한 공격력
     this.range = 150; // 짧은 사정거리
+    this.upgradeCost = 70; //업그레이드 비용
   }
 
   attack(monster) {
@@ -72,6 +75,7 @@ export class WeakRangeTower extends Tower {
     super(x, y, 80);
     this.attackPower = 20; // 약한 공격력
     this.range = 400; // 긴 사정거리
+    this.upgradeCost = 40; //업그레이드 비용
   }
 
   attack(monster) {
@@ -85,6 +89,7 @@ export class MultiTargetTower extends Tower {
     super(x, y, 120);
     this.attackPower = 30;
     this.range = 300; // 중간 사정거리
+    this.upgradeCost = 50; //업그레이드 비용
     this.attackInterval = 300; // 5초에 한번 공격
     this.lastAttackTime = 0; // 마지막 공격 시간
   }
@@ -119,6 +124,7 @@ export class LaserTower extends Tower {
     super(x, y, 130);
     this.attackPower = 30;
     this.range = 300; // 중간 사정거리
+    this.upgradeCost = 50; //업그레이드 비용
   }
 
   attack(monster) {
