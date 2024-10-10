@@ -57,7 +57,7 @@ export class Tower {
 export class StrongSingleTower extends Tower {
   constructor(x, y) {
     super(x, y, 100);
-    this.attackPower = 60; // 강력한 공격력
+    this.attackPower = 80; // 강력한 공격력
     this.range = 150; // 짧은 사정거리
   }
 
@@ -79,12 +79,13 @@ export class WeakRangeTower extends Tower {
   }
 }
 
+//여러마리 때릴 수 있는 타워(최대 3마리)
 export class MultiTargetTower extends Tower {
   constructor(x, y) {
     super(x, y, 120);
-    this.attackPower = 30; // 중간 공격력
+    this.attackPower = 30;
     this.range = 300; // 중간 사정거리
-    this.attackInterval = 600; // 10초에 한번 공격 (600프레임)
+    this.attackInterval = 300; // 5초에 한번 공격
     this.lastAttackTime = 0; // 마지막 공격 시간
   }
 
@@ -108,6 +109,28 @@ export class MultiTargetTower extends Tower {
       this.lastAttackTime = this.attackInterval; // 공격 쿨타임 설정
     } else {
       this.lastAttackTime--; // 쿨타임 감소
+    }
+  }
+}
+
+//가까이오면 죽을때까지 때리는 타워
+export class LaserTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 130);
+    this.attackPower = 30;
+    this.range = 300; // 중간 사정거리
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower; // 공격
+      this.cooldown = 60; // 1초마다 공격
+    }
+  }
+
+  updateCooldown() {
+    if (this.cooldown > 0) {
+      this.cooldown--;
     }
   }
 }
