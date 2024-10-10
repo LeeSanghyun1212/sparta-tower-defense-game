@@ -5,7 +5,7 @@ export const catchMonster = (userId, payload) => {
   // 클라이언트가 잡은 몬스터의 정보
 
   // const { stages } = getGameAssets();
-  const { monsterId, level, monsterScore } = payload;
+  const { monsterNumber, level, monsterScore } = payload;
   const currentStages = getStage(userId);
   const userGetCatchMonster = getCatchMonster(userId);
 
