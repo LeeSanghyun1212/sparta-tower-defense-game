@@ -1,5 +1,6 @@
 import { Base } from './base.js';
 import { Monster } from './monster.js';
+import { sendEvent } from './socket.js';
 import { Tower } from './tower.js';
 
 /* 
@@ -217,6 +218,8 @@ function gameLoop() {
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
+      score += monster.score;
+      sendEvent(31, {monsterId: monster.monsterNumber, level: monster.level, monsterScore: monster.score});
       monsters.splice(i, 1);
     }
   }
