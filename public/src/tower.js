@@ -11,6 +11,7 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    this.towerLevel = 1; //타워 레벨
   }
 
   draw(ctx, towerImage) {
@@ -40,6 +41,73 @@ export class Tower {
   updateCooldown() {
     if (this.cooldown > 0) {
       this.cooldown--;
+    }
+  }
+
+  upgrade() {
+    if (this.towerLevel < 3) {
+      this.towerLevel++;
+      this.attackPower += 10;
+      this.range += 20;
+    }
+  }
+}
+
+//사거리 짧은 단일 공격 타워
+export class StrongSingleTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 100);
+    this.attackPower = 60; // 강력한 공격력
+    this.range = 150; // 짧은 사정거리
+  }
+
+  attack(monster) {
+    super.attack(monster); // 기본 공격 메소드 사용
+  }
+}
+
+//사거리 긴 단일 공격 타워
+export class WeakRangeTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 80);
+    this.attackPower = 20; // 약한 공격력
+    this.range = 400; // 긴 사정거리
+  }
+
+  attack(monster) {
+    super.attack(monster); // 기본 공격 메소드 사용
+  }
+}
+
+export class MultiTargetTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 120);
+    this.attackPower = 30; // 중간 공격력
+    this.range = 300; // 중간 사정거리
+    this.attackInterval = 600; // 10초에 한번 공격 (600프레임)
+    this.lastAttackTime = 0; // 마지막 공격 시간
+  }
+
+  attack(monsters) {
+    if (this.lastAttackTime <= 0) {
+      let attackedCount = 0;
+
+      for (const monster of monsters) {
+        if (attackedCount < 3) {
+          // 최대 3마리 공격
+          const distance = Math.sqrt(
+            Math.pow(this.x - monster.x, 2) + Math.pow(this.y - monster.y, 2),
+          );
+          if (distance < this.range) {
+            monster.hp -= this.attackPower; // 공격
+            attackedCount++;
+          }
+        }
+      }
+
+      this.lastAttackTime = this.attackInterval; // 공격 쿨타임 설정
+    } else {
+      this.lastAttackTime--; // 쿨타임 감소
     }
   }
 }
