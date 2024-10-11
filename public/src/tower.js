@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 export class Tower {
   constructor(x, y, cost) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
@@ -5,11 +7,11 @@ export class Tower {
     this.y = y; // 타워 이미지 y 좌표
     this.width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
     this.height = 150; // 타워 이미지 세로 길이
-    this.attackPower = 40; // 타워 공격력
-    this.range = 300; // 타워 사거리
+    this.attackPower = attackPower; // 타워 공격력
+    this.range = range; // 타워 사거리
     this.cost = cost; // 타워 구입 비용
-    this.cooldown = 0; // 타워 공격 쿨타임
-    this.beamDuration = 0; // 타워 광선 지속 시간
+    this.cooldown = cooldown; // 타워 공격 쿨타임
+    this.beamDuration = beamDuration; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
     this.towerLevel = 1; //타워 레벨
     this.upgradeCost = 50; //기본 업그레이드 비용
@@ -48,15 +50,23 @@ export class Tower {
   upgrade() {
     if (this.towerLevel < 3) {
       this.towerLevel++;
-      this.attackPower += 10;
-      this.range += 20;
+
+      // 공격력 및 사거리 증가
+      if (this.towerLevel === 2) {
+        this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
+        this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
+      } else if (this.towerLevel === 3) {
+        this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
+        this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
+      }
+
       this.upgradeCost += 20; // 업그레이드 비용 증가
     }
   }
 }
 
 //사거리 짧은 단일 공격 타워
-export class StrongSingleTower extends Tower {
+export class pawnTower extends Tower {
   constructor(x, y) {
     super(x, y, 100);
     this.attackPower = 80; // 강력한 공격력
@@ -70,7 +80,7 @@ export class StrongSingleTower extends Tower {
 }
 
 //사거리 긴 단일 공격 타워
-export class WeakRangeTower extends Tower {
+export class rookTower extends Tower {
   constructor(x, y) {
     super(x, y, 80);
     this.attackPower = 20; // 약한 공격력
@@ -84,7 +94,7 @@ export class WeakRangeTower extends Tower {
 }
 
 //여러마리 때릴 수 있는 타워(최대 3마리)
-export class MultiTargetTower extends Tower {
+export class knightTower extends Tower {
   constructor(x, y) {
     super(x, y, 120);
     this.attackPower = 30;
@@ -118,8 +128,25 @@ export class MultiTargetTower extends Tower {
   }
 }
 
+export class bishopTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 130, 30, 300, 60, 60); // 기본 공격력, 사거리, 쿨타임, 광선 지속 시간 설정
+    this.slowAmount = 0.5; // 몬스터 속도를 50% 감소시킴
+    this.slowDuration = 120; // 속도 감소 지속 시간 (120 프레임 = 2초)
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower; // 몬스터 공격
+      monster.speed *= this.slowAmount; // 몬스터 속도 감소
+      monster.slowDuration = this.slowDuration; // 속도 감소 지속 시간 설정
+      this.cooldown = 60; // 공격 쿨타임 설정
+    }
+  }
+}
+
 //가까이오면 죽을때까지 때리는 타워
-export class LaserTower extends Tower {
+export class queenTower extends Tower {
   constructor(x, y) {
     super(x, y, 130);
     this.attackPower = 30;
@@ -138,5 +165,18 @@ export class LaserTower extends Tower {
     if (this.cooldown > 0) {
       this.cooldown--;
     }
+  }
+}
+
+export class kingTower extends Tower {
+  constructor(x, y) {
+    super(x, y, 80);
+    this.attackPower = 400;
+    this.range = 150;
+    this.upgradeCost = 40;
+  }
+
+  attack(monster) {
+    super.attack(monster);
   }
 }
