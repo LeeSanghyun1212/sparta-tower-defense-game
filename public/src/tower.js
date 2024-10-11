@@ -50,8 +50,6 @@ export class Tower {
   upgrade() {
     if (this.towerLevel < 3) {
       this.towerLevel++;
-
-      // 공격력 및 사거리 증가
       if (this.towerLevel === 2) {
         this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
         this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
@@ -59,7 +57,6 @@ export class Tower {
         this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
         this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
       }
-
       this.upgradeCost += 20; // 업그레이드 비용 증가
     }
   }
@@ -68,38 +65,24 @@ export class Tower {
 //사거리 짧은 단일 공격 타워
 export class pawnTower extends Tower {
   constructor(x, y) {
-    super(x, y, 100);
-    this.attackPower = 80; // 강력한 공격력
-    this.range = 150; // 짧은 사정거리
-    this.upgradeCost = 70; //업그레이드 비용
-  }
-
-  attack(monster) {
-    super.attack(monster); // 기본 공격 메소드 사용
+    super(x, y, 100, 20, 150, 180, 30); //비용, 공격력, 사거리, 쿨타임, 지속시간
+    this.upgradeCost = 50; // 업그레이드 비용
   }
 }
 
 //사거리 긴 단일 공격 타워
 export class rookTower extends Tower {
   constructor(x, y) {
-    super(x, y, 80);
-    this.attackPower = 20; // 약한 공격력
-    this.range = 400; // 긴 사정거리
-    this.upgradeCost = 40; //업그레이드 비용
-  }
-
-  attack(monster) {
-    super.attack(monster); // 기본 공격 메소드 사용
+    super(x, y, 80, 40, 400, 160, 60);
+    this.upgradeCost = 50; // 업그레이드 비용
   }
 }
 
 //여러마리 때릴 수 있는 타워(최대 3마리)
 export class knightTower extends Tower {
   constructor(x, y) {
-    super(x, y, 120);
-    this.attackPower = 30;
-    this.range = 300; // 중간 사정거리
-    this.upgradeCost = 50; //업그레이드 비용
+    super(x, y, 120, 30, 300, 300, 60);
+    this.upgradeCost = 50; // 업그레이드 비용
     this.attackInterval = 300; // 5초에 한번 공격
     this.lastAttackTime = 0; // 마지막 공격 시간
   }
@@ -110,7 +93,6 @@ export class knightTower extends Tower {
 
       for (const monster of monsters) {
         if (attackedCount < 3) {
-          // 최대 3마리 공격
           const distance = Math.sqrt(
             Math.pow(this.x - monster.x, 2) + Math.pow(this.y - monster.y, 2),
           );
@@ -120,7 +102,6 @@ export class knightTower extends Tower {
           }
         }
       }
-
       this.lastAttackTime = this.attackInterval; // 공격 쿨타임 설정
     } else {
       this.lastAttackTime--; // 쿨타임 감소
@@ -128,11 +109,12 @@ export class knightTower extends Tower {
   }
 }
 
+// 슬로우 타워
 export class bishopTower extends Tower {
   constructor(x, y) {
-    super(x, y, 130, 30, 300, 60, 60); // 기본 공격력, 사거리, 쿨타임, 광선 지속 시간 설정
+    super(x, y, 130, 10, 300, 60, 30);
     this.slowAmount = 0.5; // 몬스터 속도를 50% 감소시킴
-    this.slowDuration = 120; // 속도 감소 지속 시간 (120 프레임 = 2초)
+    this.slowDuration = 120; // 속도 감소 지속 시간
   }
 
   attack(monster) {
@@ -148,10 +130,8 @@ export class bishopTower extends Tower {
 //가까이오면 죽을때까지 때리는 타워
 export class queenTower extends Tower {
   constructor(x, y) {
-    super(x, y, 130);
-    this.attackPower = 30;
-    this.range = 300; // 중간 사정거리
-    this.upgradeCost = 50; //업그레이드 비용
+    super(x, y, 200, 60, 450, 60, 60);
+    this.upgradeCost = 150; // 업그레이드 비용
   }
 
   attack(monster) {
@@ -160,20 +140,12 @@ export class queenTower extends Tower {
       this.cooldown = 60; // 1초마다 공격
     }
   }
-
-  updateCooldown() {
-    if (this.cooldown > 0) {
-      this.cooldown--;
-    }
-  }
 }
 
 export class kingTower extends Tower {
   constructor(x, y) {
-    super(x, y, 80);
-    this.attackPower = 400;
-    this.range = 150;
-    this.upgradeCost = 40;
+    super(x, y, 250, 500, 150, 60, 60);
+    this.upgradeCost = 150; // 업그레이드 비용
   }
 
   attack(monster) {
