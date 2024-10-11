@@ -32,7 +32,7 @@ const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
 
 const towerImage = new Image();
-towerImage.src = 'images/tower.png';
+towerImage.src = 'images/tower_pawn.png';
 
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
