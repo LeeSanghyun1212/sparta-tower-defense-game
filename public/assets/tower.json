@@ -1,0 +1,60 @@
+{
+  "name": "tower",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1,
+      "level": 1,
+      "cost": 500,
+      "attackPower": 10,
+      "range": 500,
+      "cooldown": 180,
+      "beamDuration": 100
+    },
+    {
+      "id": 2,
+      "level": 2,
+      "cost": 500,
+      "attackPower": 200,
+      "range": 500,
+      "cooldown": 180,
+      "beamDuration": 100
+    },
+    {
+      "id": 3,
+      "level": 3,
+      "cost": 500,
+      "attackPower": 40,
+      "range": 300,
+      "cooldown": 180,
+      "beamDuration": 100
+    },
+    {
+      "id": 4,
+      "level": 4,
+      "cost": 500,
+      "attackPower": 40,
+      "range": 300,
+      "cooldown": 180,
+      "beamDuration": 100
+    },
+    {
+      "id": 5,
+      "level": 5,
+      "cost": 500,
+      "attackPower": 40,
+      "range": 300,
+      "cooldown": 180,
+      "beamDuration": 100
+    },
+    {
+      "id": 6,
+      "level": 6,
+      "cost": 500,
+      "attackPower": 40,
+      "range": 300,
+      "cooldown": 180,
+      "beamDuration": 100
+    }
+  ]
+}

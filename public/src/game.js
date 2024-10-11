@@ -1,12 +1,15 @@
 import { Base } from './base.js';
+import { CLIENT_VERSION } from './constant.js';
 import { Monster } from './monster.js';
+import { sendGameStartEvent } from './socket.js';
 import { Tower } from './tower.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
+const userId = 1;
 
-let serverSocket; // 서버 웹소켓 객체
+export let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -19,7 +22,7 @@ let baseHp = 0; // 기지 체력
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -29,21 +32,21 @@ let isInitGame = false;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
-backgroundImage.src = 'images/bg.webp';
+backgroundImage.src = '../images/bg.webp';
 
 const towerImage = new Image();
-towerImage.src = 'images/tower.png';
+towerImage.src = '../images/tower.png';
 
 const baseImage = new Image();
-baseImage.src = 'images/base.png';
+baseImage.src = '../images/base.png';
 
 const pathImage = new Image();
-pathImage.src = 'images/path.png';
+pathImage.src = '../images/path.png';
 
 const monsterImages = [];
 for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
   const img = new Image();
-  img.src = `images/monster${i}.png`;
+  img.src = `../images/monster${i}.png`;
   monsterImages.push(img);
 }
 
@@ -146,7 +149,7 @@ function placeInitialTowers() {
   */
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost);
+    const tower = new Tower(x, y, 1);
     towers.push(tower);
     tower.draw(ctx, towerImage);
   }
@@ -224,7 +227,21 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame() {
+export function initGameData(data) {
+  console.log('initGameData : ', data);
+  userGold = data.userGold; // 유저 골드
+  baseHp = data.baseHp; // 기지 체력
+
+  towerCost = data.towerCost; // 타워 구입 비용
+  numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
+  monsterLevel = data.monsterLevel; // 몬스터 레벨
+  monsterSpawnInterval = data.monsterSpawnInterval; // 몬스터 생성 주기
+
+  score = data.score; // 게임 점수
+  highScore = data.highScore; // 기존 최고 점수
+}
+
+export function initGame() {
   if (isInitGame) {
     return;
   }
@@ -248,13 +265,44 @@ Promise.all([
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
-  serverSocket = io('서버주소', {
+  // let somewhere;
+  serverSocket = io('http://localhost:3000', {
+    query: {
+      clientVersion: CLIENT_VERSION,
+    },
     auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+      userId: userId,
     },
   });
 
+  serverSocket.on('connection', (data) => {
+    console.log('connection Complete');
+    sendGameStartEvent(userId, 11, Date.now());
+  });
+
+  serverSocket.on('response', (data) => {
+    console.log(data);
+
+    try {
+      switch (data.handlerId) {
+        case 11:
+          {
+            if (!isInitGame) {
+              initGameData(data.initGameData);
+              initGame();
+            }
+          }
+          break;
+        default:
+          {
+            console.log(`handlerId : ${data.handlerId}`);
+          }
+          break;
+      }
+    } catch (err) {
+      console.error('Response : Not Available data', err, message);
+    }
+  });
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
