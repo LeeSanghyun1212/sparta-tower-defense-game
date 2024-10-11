@@ -35,6 +35,10 @@
         display: none; /* 업그레이드 버튼을 기본적으로 숨김 */
         margin-top: 20px;
       }
+      #tower-buttons {
+        display: none; /*타워 버튼을 기본적으로 숨김*/
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
@@ -49,7 +53,14 @@
     <div class="upgrade-container">
       <button id="upgradeTowerButton">타워 업그레이드</button>
     </div>
-
+    <div id="tower-buttons">
+      <button id="pawnTowerButton">Pawn Tower</button>
+      <button id="rookTowerButton">Rook Tower</button>
+      <button id="knightTowerButton">Knight Tower</button>
+      <button id="bishopTowerButton">Bishop Tower</button>
+      <button id="queenTowerButton">Queen Tower</button>
+      <button id="kingTowerButton">King Tower</button>
+    </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
       document.getElementById('registerButton').addEventListener('click', () => {
@@ -64,6 +75,7 @@
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
         document.querySelector('.upgrade-container').style.display = 'block';
+        document.getElementById('tower-buttons').style.display = 'block';
         import('./src/game.js');
       });
 
@@ -80,6 +92,54 @@
           }
         } else {
           alert('업그레이드할 타워를 선택해주세요!');
+        }
+      });
+      const createDraggableImage = (towerType) => {
+        const img = new Image();
+        img.src = `images/tower_${towerType}.png`; // 타워 이미지 경로 설정
+        img.draggable = true;
+
+        img.addEventListener('dragstart', (event) => {
+          event.dataTransfer.setData('text/plain', towerType); // 타워 타입 저장
+        });
+
+        return img;
+      };
+
+      // 타워 버튼 클릭 시 드래그 가능한 이미지 생성
+      document.getElementById('pawnTowerButton').addEventListener('click', () => {
+        const img = createDraggableImage('pawn');
+        document.body.appendChild(img);
+      });
+
+      document.getElementById('rookTowerButton').addEventListener('click', () => {
+        const img = createDraggableImage('rook');
+        document.body.appendChild(img);
+      });
+
+      document.getElementById('knightTowerButton').addEventListener('click', () => {
+        const img = createDraggableImage('knight');
+        document.body.appendChild(img);
+      });
+
+      // 추가 타워 버튼 이벤트 처리...
+
+      // 드래그 앤 드롭 수행
+      const canvas = document.getElementById('gameCanvas');
+      canvas.addEventListener('dragover', (event) => {
+        event.preventDefault(); // 기본 동작 방지
+      });
+
+      canvas.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const towerType = event.dataTransfer.getData('text/plain');
+        const { offsetX, offsetY } = event;
+
+        // 타워가 경로 위에 놓이지 않도록 검사
+        if (isPositionValid(offsetX, offsetY)) {
+          placeNewTower(towerType, offsetX, offsetY); // 타워 배치
+        } else {
+          alert('경로 위에는 타워를 배치할 수 없습니다!');
         }
       });
     </script>
