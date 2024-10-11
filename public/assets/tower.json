@@ -4,9 +4,10 @@
   "data": [
     {
       "id": 1,
-      "attack_power": 40,
-      "range": 300,
-      "cost": 500,
+      "type": "pawnTower",
+      "attack_power": 80,
+      "range": 150,
+      "cost": 100,
       "cooldown": 180,
       "beamDuration": 30,
       "width": 78,
@@ -14,10 +15,55 @@
     },
     {
       "id": 2,
-      "attack_power": 50,
-      "range": 310,
-      "cost": 1000,
+      "type": "rookTower",
+      "attack_power": 20,
+      "range": 400,
+      "cost": 80,
       "cooldown": 160,
+      "beamDuration": 60,
+      "width": 78,
+      "height": 150
+    },
+    {
+      "id": 3,
+      "type": "knightTower",
+      "attack_power": 30,
+      "range": 300,
+      "cost": 120,
+      "cooldown": 300,
+      "beamDuration": 60,
+      "width": 78,
+      "height": 150
+    },
+    {
+      "id": 4,
+      "type": "bishopTower",
+      "attack_power": 30,
+      "range": 300,
+      "cost": 130,
+      "cooldown": 60,
+      "beamDuration": 60,
+      "width": 78,
+      "height": 150
+    },
+    {
+      "id": 5,
+      "type": "queenTower",
+      "attack_power": 30,
+      "range": 300,
+      "cost": 130,
+      "cooldown": 60,
+      "beamDuration": 60,
+      "width": 78,
+      "height": 150
+    },
+    {
+      "id": 6,
+      "type": "kingTower",
+      "attack_power": 30,
+      "range": 300,
+      "cost": 130,
+      "cooldown": 60,
       "beamDuration": 60,
       "width": 78,
       "height": 150
