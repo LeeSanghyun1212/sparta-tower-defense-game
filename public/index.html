@@ -94,6 +94,7 @@
           alert('업그레이드할 타워를 선택해주세요!');
         }
       });
+
       const createDraggableImage = (towerType) => {
         const img = new Image();
         img.src = `images/tower_${towerType}.png`; // 타워 이미지 경로 설정
@@ -102,6 +103,9 @@
         img.addEventListener('dragstart', (event) => {
           event.dataTransfer.setData('text/plain', towerType); // 타워 타입 저장
         });
+
+        img.width = 78;
+        img.height = 150;
 
         return img;
       };
