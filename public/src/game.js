@@ -210,6 +210,7 @@ function gameLoop() {
   drawPath(monsterPath); // 경로 다시 그리기
 
   ctx.font = '40px Times New Roman';
+  ctx.textAlign = 'left';
   ctx.fillStyle = 'black';
   ctx.fillText(`최고 기록: ${highScore}`, 50, 50); // 최고 기록 표시
   ctx.fillStyle = 'black';
@@ -217,12 +218,13 @@ function gameLoop() {
   ctx.fillStyle = 'black';
   ctx.fillText(`골드: ${userGold}`, 50, 150); // 골드 표시
   ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
   const stageNumber = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
-  ctx.fillText(`현재 스테이지 : ${stageNumber}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`${stageNumber} Stage`, canvas.width / 2, 100, 200); // 최고 기록 표시
 
   ctx.font = '50px Times New Roman';
   ctx.fillStyle = 'black';
-  ctx.fillText(`남은 시간 : ${goalTimestamp - Math.floor(deltaTime)}`, canvas.width / 2 - 100, 50);
+  ctx.fillText(`남은 시간 : ${goalTimestamp - Math.floor(deltaTime)}`, canvas.width / 2, 50);
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
