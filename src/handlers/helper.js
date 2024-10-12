@@ -13,7 +13,10 @@ export const handleDisconnect = (socket, userId) => {
 };
 
 export const handleConnection = async (socket, userId) => {
+  // user의 userId, socketId 정보를 저장한다.
   addUser({ userId, socketId: socket.id });
+
+  // user가 플레이한 stage 정보들을 저장할 배열을 생성한다.
   createStage(userId);
 
   console.log(`New User Connected : ${userId} with socket ID ${socket.id} `);

@@ -1,8 +1,15 @@
 import { Base } from './base.js';
 import { CLIENT_VERSION } from './constant.js';
+import { stageDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
-import { sendGameStartEvent } from './socket.js';
+import {
+  sendAttackedBaseEvent,
+  sendCatchMonsterEvent,
+  sendGameStartEvent,
+  sendMoveStageEvent,
+} from './socket.js';
 import { Tower } from './tower.js';
+import { getTargetStageId } from './util/stage.util.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -18,16 +25,21 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
+let startTimestamp = 0; // 게임 시작 시간
+let timestamp = 0; // 게임 진행 시간
+let goalTimestamp = 0; // 스테이지 목표 시간
 
-let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 1000; // 몬스터 생성 주기
+
+let stageId = 0;
+let stageChange = false;
+let monsterId = 0; // 몬스터 ID
+let monsterSpawnInterval = 0; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
 let score = 0; // 게임 점수
-let highScore = 0; // 기존 최고 점수
+let highScore = 10000; // 기존 최고 점수
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -173,23 +185,44 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  monsters.push(new Monster(monsterPath, monsterImages, monsterId));
 }
 
 function gameLoop() {
+  // 스테이지 경과 시간 text로 출력
+  timestamp = Date.now();
+  const deltaTime = (timestamp - startTimestamp) / 1000;
+
+  // 스테이지 목표 시간을 버티면 다음 스테이지로 넘어간다
+  if (deltaTime > goalTimestamp && stageChange) {
+    stageChange = false;
+    const targetStageId = getTargetStageId(stageId);
+    if (targetStageId !== null) {
+      // 다음 스테이지가 있다면 이동
+      sendMoveStageEvent(userId, stageId, targetStageId, timestamp, score, base.hp);
+    } else {
+      // 다음 스테이지가 없다면, Game Clear
+    }
+  }
+
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
-  ctx.font = '25px Times New Roman';
-  ctx.fillStyle = 'skyblue';
-  ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
-  ctx.fillStyle = 'white';
-  ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
+  ctx.font = '40px Times New Roman';
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`최고 기록: ${highScore}`, 50, 50); // 최고 기록 표시
+  ctx.fillStyle = 'black';
+  ctx.fillText(`점수: ${score}`, 50, 100); // 현재 스코어 표시
+  ctx.fillStyle = 'black';
+  ctx.fillText(`골드: ${userGold}`, 50, 150); // 골드 표시
+  ctx.fillStyle = 'black';
+  const stageNumber = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
+  ctx.fillText(`현재 스테이지 : ${stageNumber}`, 100, 200); // 최고 기록 표시
+
+  ctx.font = '50px Times New Roman';
+  ctx.fillStyle = 'black';
+  ctx.fillText(`남은 시간 : ${goalTimestamp - Math.floor(deltaTime)}`, canvas.width / 2 - 100, 50);
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -211,7 +244,12 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isDestroyed = monster.move(base);
+      const { isDestroyed, isAttacked } = monster.move(base);
+      if (!isDestroyed && isAttacked) {
+        /* 기지 공격 받음 */
+        sendAttackedBaseEvent(userId, monster.id);
+        monsters.splice(i, 1);
+      }
       if (isDestroyed) {
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
@@ -220,6 +258,7 @@ function gameLoop() {
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
+      sendCatchMonsterEvent(userId, monster.id);
       monsters.splice(i, 1);
     }
   }
@@ -227,21 +266,29 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-export function initGameData(data) {
-  console.log('initGameData : ', data);
-  userGold = data.userGold; // 유저 골드
-  baseHp = data.baseHp; // 기지 체력
+function initStageData(data) {
+  stageId = data;
 
-  towerCost = data.towerCost; // 타워 구입 비용
-  numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
-  monsterLevel = data.monsterLevel; // 몬스터 레벨
-  monsterSpawnInterval = data.monsterSpawnInterval; // 몬스터 생성 주기
+  const stageData = stageDataTable.data.find((stage) => stage.id === stageId);
+  if (!stageData) {
+    throw new Error(`Not Founded stage data`);
+  }
 
-  score = data.score; // 게임 점수
-  highScore = data.highScore; // 기존 최고 점수
+  monsterId = stageData.monster_id;
+  monsterSpawnInterval = stageData.monster_spawn_interval;
+  goalTimestamp = stageData.timestamp;
+  stageChange = true;
 }
 
-export function initGame() {
+function initGameData(data) {
+  userGold = data.userGold; // 유저 골드
+  baseHp = data.baseHp; // 기지 체력
+  numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
+
+  score = data.score; // 게임 점수
+}
+
+function initGame() {
   if (isInitGame) {
     return;
   }
@@ -275,42 +322,52 @@ Promise.all([
     },
   });
 
+  // Server Connection
   serverSocket.on('connection', (data) => {
     console.log('connection Complete');
-    sendGameStartEvent(userId, 11, Date.now());
+    startTimestamp = Date.now();
+    sendGameStartEvent(userId, startTimestamp);
   });
 
+  // Server Event 동기화
   serverSocket.on('response', (data) => {
     console.log(data);
 
     try {
       switch (data.handlerId) {
-        case 11:
+        case 11: // 게임 시작 Event Response Handler
           {
             if (!isInitGame) {
               initGameData(data.initGameData);
+              initStageData(data.stageId);
               initGame();
             }
           }
           break;
-        default:
+        case 13: // 스테이지 이동 Event Response Handler
           {
-            console.log(`handlerId : ${data.handlerId}`);
+            initStageData(data.stageId);
           }
           break;
+        case 31: // 몬스터 처치 Event Response Handler
+          {
+            userGold = data.userGold;
+            score = data.score;
+          }
+          break;
+        case 32: // 몬스터 자폭 Event Response Handler
+          {
+            base.baseHp = data.baseHp;
+          }
+          break;
+        default: {
+          throw new Error(`Unknown Response : ${data.handlerId}`);
+        }
       }
     } catch (err) {
-      console.error('Response : Not Available data', err, message);
+      console.error('Error : ', err.message);
     }
   });
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
 });
 
 const buyTowerButton = document.createElement('button');
