@@ -211,6 +211,21 @@ function getRandomPositionNearPath(maxDistance) {
   };
 }
 
+function checkPlaceTowerPos(x, y) {
+  const maxDistanceNearPath = 100;
+  let minDistanceNearPath = 10000;
+
+  const result = monsterPath.every((path) => {
+    const distance = Math.sqrt(Math.pow(x - path.x, 2) + Math.pow(y - path.y, 2));
+
+    console.log(distance);
+
+    return distance > maxDistanceNearPath;
+  });
+  //console.log('min Distance : ', minDistanceNearPath, 'result : ', result);
+  return result;
+}
+
 function placeInitialTowers() {
   /* 
     타워를 초기에 배치하는 함수입니다.
@@ -224,12 +239,12 @@ function placeInitialTowers() {
   }
 }
 
-function placeNewTower() {
+function placeNewTower(x, y) {
   /* 
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
   */
-  const { x, y } = getRandomPositionNearPath(200);
+  //const { x, y } = getRandomPositionNearPath(200);
   const tower = new Tower(x, y, 1);
   towers.push(tower);
   tower.draw(ctx, towerImage);
@@ -287,7 +302,7 @@ function gameLoop() {
   towers.forEach((tower) => {
     tower.draw(ctx, towerImage);
     tower.updateCooldown();
-    monsters.forEach((monster) => {
+    monsters.some((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
@@ -391,7 +406,7 @@ Promise.all([
 
   // Server Event 동기화
   serverSocket.on('response', (data) => {
-    console.log(data);
+    //console.log(data);
 
     try {
       switch (data.handlerId) {
@@ -417,7 +432,7 @@ Promise.all([
           break;
         case 32: // 몬스터 자폭 Event Response Handler
           {
-            base.baseHp = data.baseHp;
+            base.hp = data.baseHp;
           }
           break;
         default: {
@@ -448,6 +463,10 @@ function clickEvent(event) {
   const dy = event.clientY - ctx.canvas.offsetTop;
 
   console.log(dx, dy);
+
+  if (checkPlaceTowerPos(dx, dy)) {
+    placeNewTower(dx, dy);
+  }
 }
 
 canvas.addEventListener('click', clickEvent);

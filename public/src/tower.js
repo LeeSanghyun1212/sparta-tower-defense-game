@@ -29,10 +29,16 @@ export class Tower {
   }
 
   draw(ctx, towerImage) {
-    ctx.drawImage(towerImage, this.x, this.y, this.width, this.height);
+    ctx.drawImage(
+      towerImage,
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height,
+    );
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
-      ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
+      ctx.moveTo(this.x, this.y);
       ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
       ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;

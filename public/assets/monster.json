@@ -20,8 +20,8 @@
       "stage_id": 101,
       "score": 100,
       "speed": 1.1,
-      "width": 53,
-      "height": 80,
+      "width": 120,
+      "height": 100,
       "imageIndex": 1
     },
     {
@@ -53,8 +53,8 @@
       "stage_id": 100,
       "score": 100,
       "speed": 1,
-      "width": 190,
-      "height": 180,
+      "width": 120,
+      "height": 100,
       "imageIndex": 1
     },
     {
