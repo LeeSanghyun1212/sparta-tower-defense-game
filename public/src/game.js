@@ -93,13 +93,68 @@ function generateRandomMonsterPath() {
   return path;
 }
 
+function generateCustomMonsterPath() {
+  const path = [];
+
+  let canvasQuarterWidth = Math.floor(canvas.width / 4);
+  let canvasHalfHeight = Math.floor(canvas.height / 2);
+  let cornerGap = Math.floor(canvasQuarterWidth / 2);
+  let pathGap = 60;
+  let quarterNumber = 0;
+  const isSigned = Math.floor(Math.random() * 2) ? true : false;
+  let yPosArr = [];
+
+  for (let i = 0; i < 3; i++) {
+    const halfHeight = Math.floor(canvas.height / 2);
+    let randomYPos = Math.floor(Math.random() * 300) + 100;
+    if (i % 2 === 0) {
+      randomYPos = isSigned ? halfHeight + randomYPos : halfHeight - randomYPos;
+    } else {
+      randomYPos = isSigned ? halfHeight - randomYPos : halfHeight + randomYPos;
+    }
+    yPosArr.push(randomYPos);
+  }
+  yPosArr.push(Math.floor(canvas.height / 2));
+
+  console.log(yPosArr);
+  console.log(canvasQuarterWidth);
+
+  let currentX = 0;
+  let currentY = canvasHalfHeight;
+
+  path.push({ x: currentX, y: currentY });
+
+  while (currentX < canvas.width) {
+    if (currentX < canvasQuarterWidth * (quarterNumber + 1) - cornerGap) {
+      currentX += pathGap;
+    } else {
+      if (currentY < yPosArr[quarterNumber]) {
+        currentY += pathGap;
+        if (currentY >= yPosArr[quarterNumber]) {
+          quarterNumber += 1;
+        }
+      } else {
+        currentY -= pathGap;
+        if (currentY <= yPosArr[quarterNumber]) {
+          quarterNumber += 1;
+        }
+      }
+    }
+    path.push({ x: currentX, y: currentY });
+  }
+
+  console.log(path.length);
+
+  return path;
+}
+
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath();
 }
 
 function drawPath() {
-  const segmentLength = 20; // 몬스터 경로 세그먼트 길이
+  const segmentLength = 60; // 몬스터 경로 세그먼트 길이
   const imageWidth = 60; // 몬스터 경로 이미지 너비
   const imageHeight = 60; // 몬스터 경로 이미지 높이
   const gap = 5; // 몬스터 경로 이미지 겹침 방지를 위한 간격
@@ -115,13 +170,15 @@ function drawPath() {
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // 피타고라스 정리로 두 점 사이의 거리를 구함 (유클리드 거리)
     const angle = Math.atan2(deltaY, deltaX); // 두 점 사이의 각도는 tan-1(y/x)로 구해야 함 (자세한 것은 역삼각함수 참고): 삼각함수는 변의 비율! 역삼각함수는 각도를 구하는 것!
 
-    for (let j = gap; j < distance - gap; j += segmentLength) {
-      // 사실 이거는 삼각함수에 대한 기본적인 이해도가 있으면 충분히 이해하실 수 있습니다.
-      // 자세한 것은 https://thirdspacelearning.com/gcse-maths/geometry-and-measure/sin-cos-tan-graphs/ 참고 부탁해요!
-      const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
-      const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
-      drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle);
-    }
+    // for (let j = gap; j < distance - gap; j += segmentLength) {
+    //   // 사실 이거는 삼각함수에 대한 기본적인 이해도가 있으면 충분히 이해하실 수 있습니다.
+    //   // 자세한 것은 https://thirdspacelearning.com/gcse-maths/geometry-and-measure/sin-cos-tan-graphs/ 참고 부탁해요!
+    //   const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
+    //   const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
+    //   drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle);
+    // }
+
+    ctx.drawImage(pathImage, startX, startY, imageWidth, imageHeight);
   }
 }
 
@@ -173,7 +230,7 @@ function placeNewTower() {
     빠진 코드들을 채워넣어주세요! 
   */
   const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
+  const tower = new Tower(x, y, 1);
   towers.push(tower);
   tower.draw(ctx, towerImage);
 }
@@ -295,7 +352,8 @@ function initGame() {
     return;
   }
 
-  monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
+  //monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
+  monsterPath = generateCustomMonsterPath();
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
@@ -384,3 +442,12 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+function clickEvent(event) {
+  const dx = event.clientX - ctx.canvas.offsetLeft;
+  const dy = event.clientY - ctx.canvas.offsetTop;
+
+  console.log(dx, dy);
+}
+
+canvas.addEventListener('click', clickEvent);

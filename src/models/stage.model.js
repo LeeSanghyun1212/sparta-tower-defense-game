@@ -24,12 +24,15 @@ export const clearStage = (userId) => {
   return (stages[userId] = []);
 };
 
+export const removeStage = (userId) => {
+  return delete stages[userId];
+};
+
 export const getCurrentStage = (userId) => {
   const stages = getStage(userId);
 
-  stages.sort((a, b) => {
-    a.id, b.id;
-  });
+  stages.sort((a, b) => a.id - b.id);
+
   const currentStage = stages[stages.length - 1];
 
   return currentStage;
