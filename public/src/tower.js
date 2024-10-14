@@ -1,5 +1,3 @@
-
-import fs from 'fs';
 import { towerDataTable } from './init/asset.js';
 
 export class Tower {

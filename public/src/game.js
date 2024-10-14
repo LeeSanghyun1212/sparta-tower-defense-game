@@ -2,7 +2,7 @@ import { Base } from './base.js';
 import { CLIENT_VERSION } from './constant.js';
 import { stageDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
-import { sendGameStartEvent } from './socket.js';
+import { sendEvent, sendGameStartEvent } from './socket.js';
 import { Tower } from './tower.js';
 
 /* 
@@ -46,12 +46,12 @@ const towerImages = {
   kingTower: new Image(),
 };
 // 각 타워 이미지 소스 설정
-towerImages.pawnTower.src = 'images/tower_pawn.png';
-towerImages.rookTower.src = 'images/tower_rook.png';
-towerImages.knightTower.src = 'images/tower_knight.png';
-towerImages.bishopTower.src = 'images/tower_bishop.png';
-towerImages.queenTower.src = 'images/tower_queen.png';
-towerImages.kingTower.src = 'images/tower_king.png';
+towerImages.pawnTower.src = '../images/tower_pawn.png';
+towerImages.rookTower.src = '../images/tower_rook.png';
+towerImages.knightTower.src = '../images/tower_knight.png';
+towerImages.bishopTower.src = '../images/tower_bishop.png';
+towerImages.queenTower.src = '../images/tower_queen.png';
+towerImages.kingTower.src = '../images/tower_king.png';
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -238,17 +238,17 @@ function placeInitialTowers() {
   }
 }
 
-function placeNewTower() {
-  if (userGold < towerCost) {
+function placeNewTower(x, y) {
+  if (userGold < 500) {
     alert('골드가 부족합니다!');
     return;
   }
 
-  userGold -= towerCost;
-  const { x, y } = getRandomPositionNearPath(200);
+  userGold -= 500;
+  //const { x, y } = getRandomPositionNearPath(200);
 
   const towerType = 'pawnTower';
-  const tower = new Tower(x, y);
+  const tower = new Tower(x, y, 1);
 
   towers.push(tower);
   tower.draw(ctx, towerImages[towerType]);
@@ -291,7 +291,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages.pawnTower);
     tower.updateCooldown();
     monsters.forEach((monster) => {
       const distance = Math.sqrt(
@@ -309,7 +309,7 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isDestroyed = monster.move(monsterLevel, base);
+      const isDestroyed = monster.move(stageNumber, base);
       if (isDestroyed) {
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
@@ -319,7 +319,12 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
-      Event(31, {stageLevel: monsterLevel, monsterNumber: monster.monsterNumber, monsterLevel: monster.level, monsterScore: monster.score});
+      sendEvent(userId, 31, {
+        stageLevel: stageId,
+        monsterNumber: monster.monsterNumber,
+        monsterLevel: monster.level,
+        monsterScore: monster.score,
+      });
       monsters.splice(i, 1);
     }
   }
@@ -401,6 +406,14 @@ Promise.all([
               initStageData(data.stageId);
               initGame();
             }
+          }
+          break;
+        case 31:
+          {
+          }
+          break;
+        case 32:
+          {
           }
           break;
         default: {
