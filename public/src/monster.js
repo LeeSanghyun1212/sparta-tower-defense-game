@@ -25,7 +25,7 @@ export class Monster {
     this.score = 10*(1 + level);
   }
 
-  move(base) {
+  move(stageLevel, base) {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -43,7 +43,7 @@ export class Monster {
       }
       return false;
     } else {
-      const isDestroyed = base.takeDamage(this.level, this.attackPower); // 기지에 도달하면 기지에 데미지를 입힙니다! 기지의 체력이 0이하이면 true 반환으로 패배 아니면 정상진행
+      const isDestroyed = base.takeDamage(stageLevel, this.attackPower); // 기지에 도달하면 기지에 데미지를 입힙니다! 기지의 체력이 0이하이면 true 반환으로 패배 아니면 정상진행
       this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
       return isDestroyed;
     }
