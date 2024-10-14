@@ -219,7 +219,7 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
-      sendEvent(31, {monsterId: monster.monsterNumber, level: monster.level, monsterScore: monster.score});
+      sendEvent(31, {stageLevel: monsterLevel, monsterNumber: monster.monsterNumber, monsterLevel: monster.level, monsterScore: monster.score});
       monsters.splice(i, 1);
     }
   }
