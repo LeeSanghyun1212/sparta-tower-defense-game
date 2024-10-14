@@ -63,6 +63,9 @@
     </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
+      let userGold = 1000; // 초기 골드 설정
+      let selectedTower = null; // 선택된 타워
+
       document.getElementById('registerButton').addEventListener('click', () => {
         window.location.href = 'register.html';
       });
@@ -111,32 +114,12 @@
       };
 
       // 타워 버튼 클릭 시 드래그 가능한 이미지 생성
-      document.getElementById('pawnTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('pawn');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('rookTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('rook');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('knightTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('knight');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('bishopTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('bishop');
-        document.body.appendChild(img);
-      });
-      document.getElementById('queenTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('queen');
-        document.body.appendChild(img);
-      });
-      document.getElementById('kingTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('king');
-        document.body.appendChild(img);
+      const towerButtons = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
+      towerButtons.forEach(towerType => {
+        document.getElementById(`${towerType}TowerButton`).addEventListener('click', () => {
+          const img = createDraggableImage(towerType);
+          document.body.appendChild(img);
+        });
       });
 
       // 드래그 앤 드롭 수행
