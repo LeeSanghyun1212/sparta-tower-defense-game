@@ -2,16 +2,25 @@ import express from "express";
 import { usersPrisma } from "../utils/prisma/index.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
 const router = express.Router();
 
 //회원가입 API
-router.post("/register", async (req, res, next) => {
+router.post('/register', async (req, res, next) => {
   try {
-    const { user_id, password, checkpassword} = req.body;
+    const { loginId, password, checkpassword} = req.body;
+
+    if (!loginId) {
+      return res.status(400).json({ errorMessage: 'id를 입력해주세요.' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ errorMessage: 'password를 입력해주세요.' });
+    }
 
     // 아이디 중복 확인
     const isExistUserId = await usersPrisma.users.findFirst({
-      where: { user_id },
+      where: { loginId },
     });
     if (isExistUserId) {
       return res
@@ -21,29 +30,19 @@ router.post("/register", async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //비밀번호 확인
-    if (password !== checkpassword) {
-      return res.status(400).json({
-        errormessage: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
-      });
-    }
-
     //유저 데이터 저장
-    const account = await usersPrisma.users.create({
+    await usersPrisma.users.create({
       data: {
-        user_id,
+        loginId,
         password: hashedPassword,
       },
     });
 
-    // 유저 데이터 반환
-    const accountData = {
-      user_id: account.user_id, // Corrected typo
-    };
-
     return res
       .status(201)
-      .json({ message: "회원가입이 완료되었습니다.", accountData });
+      .json({ 
+        message: "회원가입이 완료되었습니다."
+    });
   } catch (error) {
     return res.status(500).json({
       message: "에러가 발생했습니다.",
@@ -53,13 +52,13 @@ router.post("/register", async (req, res, next) => {
 });
 
 //로그인 API
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res, next) => {
   try {
-    const { user_id, password } = req.body;
+    const { loginId, password } = req.body;
 
     //유저 존재 유무 확인
-    const account = await usersPrisma.users.findFirst({
-      where: { user_id },
+    const account = await usersPrisma.users.findUnique({
+      where: { loginId },
     });
     if (!account) {
       return res
@@ -77,8 +76,8 @@ router.post("/login", async (req, res) => {
     // 3) jwt 토큰 생성
     const token = jwt.sign(
       {
-        user_id: account.user_id,
-      },
+        loginId: account.loginId,
+      }
     );
 
     res.cookie("authorization", `Bearer ${token}`);

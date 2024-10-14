@@ -1,6 +1,6 @@
-import { PrismaClient as userDataClient } from "../../../prisma/user/generated/userDataClient/index.js";
+import { PrismaClient } from "@prisma/client";
 
-export const usersPrisma = new userDataClient({
+export const usersPrisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
   errorFormat: "pretty",
 });

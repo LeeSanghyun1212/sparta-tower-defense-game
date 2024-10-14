@@ -44,10 +44,28 @@
       <button id="back">뒤로가기</button>
     </div>
     <script>
-      document.getElementById('login').addEventListener('click', () => {
+      document.getElementById('login').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({loginId: username, password: password,}),
+        });
+        const data = await response.json();
+
+        if(response.ok){
+          const token = response.headers.get('Authorization');
+
+          localStorage.setItem('Authorization', token);
+          alert(data.message);
+          window.location.href = 'index.html';
+        } else {
+          alert(data.message);
+        }
         /* 
           로그인 API 호출 후 로그인 성공 시 index.html로 이동시켜주세요!
           이 때, 엑세스 토큰은 어딘가에 저장을 해놔야겠죠?! 

@@ -40,7 +40,7 @@
       <h2>회원가입</h2>
       <input type="text" id="username" placeholder="아이디" />
       <input type="password" id="password" placeholder="비밀번호" />
-      <input type="text" id="checkpassword" placeholder="비밀번호 확인">
+      <input type="password" id="checkpassword" placeholder="비밀번호 확인">
       <button id="register">회원가입</button>
       <button id="back">뒤로가기</button>
     </div>
@@ -48,31 +48,35 @@
       document.getElementById('register').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        try {
-          const response = await fetch('/signup', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: username, password }),
+        const checkpassword = document.getElementById('checkpassword').value;
+
+        const response = await fetch('http://localhost:3000/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({loginId: username, password: password,}),
+        });
+        const data = await response.json();
+        
+        //비밀번호 확인
+        if (password !== checkpassword) {
+          return res.status(400).json({
+            errormessage: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
           });
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(data.errorMessage || '회원가입 실패');
-          }
+        }
+
+        if (response.ok) {
+        alert(data.message);
+        window.location.href = 'index.html'; /* 회원가입 API 호출 후 회원가입 성공 시 index.html로 이동시켜주세요! */
+        } else {
           alert(data.message);
-          window.location.href = 'index.html';
-        /* 
-          회원가입 API 호출 후 회원가입 성공 시 index.html로 이동시켜주세요!
-        */
-        } catch (error) {
-          alert(error.message);
         }
       });
 
-      document.getElementById('back').addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
+    document.getElementById('back').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
     </script>
   </body>
 </html>
