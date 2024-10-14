@@ -63,8 +63,7 @@
     </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
-      let userGold = 1000; // 초기 골드 설정
-      let selectedTower = null; // 선택된 타워
+      let selectedTower = null;
 
       document.getElementById('registerButton').addEventListener('click', () => {
         window.location.href = 'register.html';
@@ -105,6 +104,10 @@
 
         img.addEventListener('dragstart', (event) => {
           event.dataTransfer.setData('text/plain', towerType); // 타워 타입 저장
+          img.style.opacity = 0.5;
+        });
+        img.addEventListener('dragend', () => {
+          img.style.opacity = 1;
         });
 
         img.width = 78;
@@ -114,9 +117,16 @@
       };
 
       // 타워 버튼 클릭 시 드래그 가능한 이미지 생성
-      const towerButtons = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
+      const towerButtons = [
+        'pawnTower',
+        'rookTower',
+        'knightTower',
+        'bishopTower',
+        'queenTower',
+        'kingTower',
+      ];
       towerButtons.forEach((towerType) => {
-        document.getElementById(`${towerType}TowerButton`).addEventListener('click', () => {
+        document.getElementById(`${towerType}Button`).addEventListener('click', () => {
           const img = createDraggableImage(towerType);
           document.body.appendChild(img);
         });

@@ -207,21 +207,19 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function checkPlaceTowerPos(x, y) {
-  const maxDistanceNearPath = 100;
-
+  const maxDistanceNearPath = 100; // 타워 배치 가능 거리
   return monsterPath.every(({ x: pathX, y: pathY }) => {
     const distance = Math.sqrt(Math.pow(x - pathX, 2) + Math.pow(y - pathY, 2));
     return distance > maxDistanceNearPath;
   });
 }
-
 function placeInitialTowers() {
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
 
     // 기본 타워 타입을 'pawnTower'로 설정
     const towerType = 'pawnTower';
-    const tower = new Tower(towerType, x, y); // 타워 생성
+    const tower = new Tower(x, y, towerType); // 타워 생성
 
     towers.push(tower);
     tower.draw(ctx, towerImages[towerType]); // 기본 타워 이미지 사용
@@ -232,6 +230,7 @@ function placeInitialTowers() {
 }
 
 function placeNewTower(towerType, x, y) {
+  console.log('Tower type:', towerType);
   const towerData = Tower.getTowerData(towerType); // 타워 데이터 가져오기
   if (!towerData) {
     alert('타워 타입이 유효하지 않습니다!');
@@ -245,7 +244,7 @@ function placeNewTower(towerType, x, y) {
 
   userGold -= towerData.cost;
 
-  const tower = new Tower(towerType, x, y); // 타워 생성
+  const tower = new Tower(x, y, towerType); // 타워 생성
   towers.push(tower);
   tower.draw(ctx, towerImages[towerType]);
 }
@@ -263,7 +262,7 @@ canvas.addEventListener('dragover', (event) => {
 
 canvas.addEventListener('drop', (event) => {
   event.preventDefault();
-  const towerType = event.dataTransfer.getData('text/plain'); // 드래그된 타워 타입 가져오기
+  const towerType = event.dataTransfer.getData('text/plain');
   const { offsetX, offsetY } = event;
 
   // 타워 배치 위치 유효성 검사
