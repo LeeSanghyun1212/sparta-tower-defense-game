@@ -1,7 +1,8 @@
-import { gameStart } from './gameStart.handler.js';
+import { catchMonster, attackedBase } from './monster.handler.js';
 
 const handlerMappings = {
-  11: gameStart, // 게임 시작 Event
+  31: catchMonster,
+  32: attackedBase,
 };
 
 export default handlerMappings;
