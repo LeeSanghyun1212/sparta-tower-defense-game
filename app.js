@@ -19,4 +19,10 @@ app.get('/', (req, res) => {
 
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  try {
+    const assets = await loadServerGameAssets();
+    console.log('Assets loaded successfully');
+  } catch (err) {
+    console.error('Failed to load game assets: ', err.message);
+  }
 });
