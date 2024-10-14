@@ -115,30 +115,11 @@
 
       // 타워 버튼 클릭 시 드래그 가능한 이미지 생성
       const towerButtons = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'];
-      towerButtons.forEach(towerType => {
+      towerButtons.forEach((towerType) => {
         document.getElementById(`${towerType}TowerButton`).addEventListener('click', () => {
           const img = createDraggableImage(towerType);
           document.body.appendChild(img);
         });
-      });
-
-      // 드래그 앤 드롭 수행
-      const canvas = document.getElementById('gameCanvas');
-      canvas.addEventListener('dragover', (event) => {
-        event.preventDefault(); // 기본 동작 방지
-      });
-
-      canvas.addEventListener('drop', (event) => {
-        event.preventDefault();
-        const towerType = event.dataTransfer.getData('text/plain');
-        const { offsetX, offsetY } = event;
-
-        // 타워가 경로 위에 놓이지 않도록 검사
-        if (isPositionValid(offsetX, offsetY)) {
-          placeNewTower(towerType, offsetX, offsetY); // 타워 배치
-        } else {
-          alert('경로 위에는 타워를 배치할 수 없습니다!');
-        }
       });
     </script>
   </body>
