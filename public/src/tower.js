@@ -1,6 +1,7 @@
 import { towerDataTable } from './init/asset.js';
 
 export class Tower {
+  static towerData = [];
   constructor(x, y, id) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
     this.x = x; // 타워 이미지 x 좌표

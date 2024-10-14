@@ -45,6 +45,7 @@ const towerImages = {
   queenTower: new Image(),
   kingTower: new Image(),
 };
+
 // 각 타워 이미지 소스 설정
 towerImages.pawnTower.src = '../images/tower_pawn.png';
 towerImages.rookTower.src = '../images/tower_rook.png';
@@ -172,15 +173,6 @@ function drawPath() {
     const deltaY = endY - startY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // 피타고라스 정리로 두 점 사이의 거리를 구함 (유클리드 거리)
     const angle = Math.atan2(deltaY, deltaX); // 두 점 사이의 각도는 tan-1(y/x)로 구해야 함 (자세한 것은 역삼각함수 참고): 삼각함수는 변의 비율! 역삼각함수는 각도를 구하는 것!
-
-    // for (let j = gap; j < distance - gap; j += segmentLength) {
-    //   // 사실 이거는 삼각함수에 대한 기본적인 이해도가 있으면 충분히 이해하실 수 있습니다.
-    //   // 자세한 것은 https://thirdspacelearning.com/gcse-maths/geometry-and-measure/sin-cos-tan-graphs/ 참고 부탁해요!
-    //   const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
-    //   const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
-    //   drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle);
-    // }
-
     ctx.drawImage(pathImage, startX, startY, imageWidth, imageHeight);
   }
 }
@@ -217,39 +209,43 @@ function getRandomPositionNearPath(maxDistance) {
 function checkPlaceTowerPos(x, y) {
   const maxDistanceNearPath = 100;
 
-  const result = monsterPath.every((path) => {
-    const distance = Math.sqrt(Math.pow(x - path.x, 2) + Math.pow(y - path.y, 2));
+  return monsterPath.every(({ x: pathX, y: pathY }) => {
+    const distance = Math.sqrt(Math.pow(x - pathX, 2) + Math.pow(y - pathY, 2));
     return distance > maxDistanceNearPath;
   });
-  return result;
 }
 
 function placeInitialTowers() {
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
 
-    const tower = new Tower(x, y, 0); // 타워 생성
+    // 기본 타워 타입을 'pawnTower'로 설정
+    const towerType = 'pawnTower';
+    const tower = new Tower(towerType, x, y); // 타워 생성
 
     towers.push(tower);
-    tower.draw(ctx, towerImages.pawnTower); // 기본 타워 이미지 사용
+    tower.draw(ctx, towerImages[towerType]); // 기본 타워 이미지 사용
 
     // 서버에 타워 좌표 전송
     serverSocket.emit('addTower', { x, y });
   }
 }
 
-function placeNewTower(x, y) {
-  if (userGold < 500) {
+function placeNewTower(towerType, x, y) {
+  const towerData = Tower.getTowerData(towerType); // 타워 데이터 가져오기
+  if (!towerData) {
+    alert('타워 타입이 유효하지 않습니다!');
+    return;
+  }
+
+  if (userGold < towerData.cost) {
     alert('골드가 부족합니다!');
     return;
   }
 
-  userGold -= 500;
-  //const { x, y } = getRandomPositionNearPath(200);
+  userGold -= towerData.cost;
 
-  const towerType = 'pawnTower';
-  const tower = new Tower(x, y, 1);
-
+  const tower = new Tower(towerType, x, y); // 타워 생성
   towers.push(tower);
   tower.draw(ctx, towerImages[towerType]);
 }
@@ -259,6 +255,24 @@ function placeBase() {
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
   base.draw(ctx, baseImage);
 }
+
+// 드래그 앤 드롭 이벤트 추가
+canvas.addEventListener('dragover', (event) => {
+  event.preventDefault(); // 기본 동작 방지
+});
+
+canvas.addEventListener('drop', (event) => {
+  event.preventDefault();
+  const towerType = event.dataTransfer.getData('text/plain'); // 드래그된 타워 타입 가져오기
+  const { offsetX, offsetY } = event;
+
+  // 타워 배치 위치 유효성 검사
+  if (checkPlaceTowerPos(offsetX, offsetY)) {
+    placeNewTower(towerType, offsetX, offsetY); // 타워 배치
+  } else {
+    alert('경로 위에는 타워를 배치할 수 없습니다!');
+  }
+});
 
 function spawnMonster() {
   monsters.push(new Monster(monsterPath, monsterImages, monsterId));
@@ -433,27 +447,3 @@ Promise.all([
     }
   */
 });
-
-const buyTowerButton = document.createElement('button');
-buyTowerButton.textContent = '타워 구입';
-buyTowerButton.style.position = 'absolute';
-buyTowerButton.style.top = '10px';
-buyTowerButton.style.right = '10px';
-buyTowerButton.style.padding = '10px 20px';
-buyTowerButton.style.fontSize = '16px';
-buyTowerButton.style.cursor = 'pointer';
-
-buyTowerButton.addEventListener('click', placeNewTower);
-
-document.body.appendChild(buyTowerButton);
-
-function clickEvent(event) {
-  const dx = event.clientX - ctx.canvas.offsetLeft;
-  const dy = event.clientY - ctx.canvas.offsetTop;
-
-  if (checkPlaceTowerPos(dx, dy)) {
-    placeNewTower(dx, dy);
-  }
-}
-
-canvas.addEventListener('click', clickEvent);
