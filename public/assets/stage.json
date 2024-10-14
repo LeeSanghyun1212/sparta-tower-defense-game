@@ -1,0 +1,54 @@
+{
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 101,
+      "timestamp": 30,
+      "monster_id": 1001,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 102,
+      "timestamp": 60,
+      "monster_id": 1002,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 103,
+      "timestamp": 90,
+      "monster_id": 1003,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 104,
+      "timestamp": 120,
+      "monster_id": 1004,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 201,
+      "timestamp": 150,
+      "monster_id": 2001,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 202,
+      "timestamp": 180,
+      "monster_id": 2002,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 203,
+      "timestamp": 210,
+      "monster_id": 2003,
+      "monster_spawn_interval": 1000
+    },
+    {
+      "id": 204,
+      "timestamp": 240,
+      "monster_id": 2005,
+      "monster_spawn_interval": 1000
+    }
+  ]
+}
