@@ -309,7 +309,7 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isDestroyed = monster.move(base);
+      const isDestroyed = monster.move(monsterLevel, base);
       if (isDestroyed) {
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
@@ -318,6 +318,8 @@ function gameLoop() {
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
+      score += monster.score;
+      Event(31, {stageLevel: monsterLevel, monsterNumber: monster.monsterNumber, monsterLevel: monster.level, monsterScore: monster.score});
       monsters.splice(i, 1);
     }
   }

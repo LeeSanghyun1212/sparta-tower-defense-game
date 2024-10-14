@@ -1,0 +1,36 @@
+// key: uuid, value: array
+const catchMonsters = {};
+const attackedBase = {};
+
+export const getCatchMonster = (uuid) => {
+  if (!catchMonsters[uuid]) {
+    catchMonsters[uuid] = [];
+  }
+  return catchMonsters[uuid];
+};
+
+// 몬스터 킬 점수를 획득한 데이터를 기록
+export const setCatchMonster = (uuid, stageLevel, monsterNumber, monsterLevel, monsterScore, timestamp) => {
+  return catchMonsters[uuid].push({ stageLevel, monsterNumber, monsterLevel, monsterScore, timestamp });
+};
+
+export const clearCatchMonster = (uuid) => {
+  catchMonsters[uuid] = [];
+};
+
+// 몬스터 자폭 생성, 조회, 변경
+export const getAttackedBase = (uuid) => {
+  if (!attackedBase[uuid]) {
+    attackedBase[uuid] = [];
+  }
+  return attackedBase[uuid];
+};
+
+// 몬스터가 기지에서 자폭한 데이터를 기록
+export const setAttackedBase = (uuid, stageLevel, baseHp, attackedDamage, timestamp) => {
+  return attackedBase[uuid].push({ stageLevel, baseHp, attackedDamage, timestamp });
+};
+
+export const clearAttackedBase = (uuid) => {
+  attackedBase[uuid] = [];
+};

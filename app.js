@@ -23,3 +23,5 @@ server.listen(PORT, async () => {
     console.error('Failed to load game assets: ', err.message);
   }
 });
+
+// issue 전송 확인
