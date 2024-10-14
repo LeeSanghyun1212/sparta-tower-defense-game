@@ -12,24 +12,23 @@ export class Monster {
     this.currentIndex = 0; // 몬스터가 이동 중인 경로의 인덱스
     this.x = path[0].x; // 몬스터의 x 좌표 (최초 위치는 경로의 첫 번째 지점)
     this.y = path[0].y; // 몬스터의 y 좌표 (최초 위치는 경로의 첫 번째 지점)
-    this.width = 80; // 몬스터 이미지 가로 길이
-    this.height = 80; // 몬스터 이미지 세로 길이
-    this.image = monsterImages[this.id - 1]; // 몬스터 이미지
-    this.init();
+    this.init(monsterImages);
   }
 
-  init() {
+  init(monsterImages) {
     const monsterData = monsterDataTable.data.find((monster) => monster.id === this.id);
     if (!monsterData) {
       console.log(`Not Fonud Monster Data : id [${id}]`);
       return;
     }
 
-    this.level = monsterData.level; // 몬스터 레벨
-    this.maxHp = monsterData.maxHp; // 몬스터의 현재 HP
-    this.hp = this.maxHp; // 몬스터의 현재 HP
+    this.maxHp = monsterData.hp; // 몬스터의 현재 HP
+    this.hp = monsterData.hp; // 몬스터의 현재 HP
     this.attackPower = monsterData.attackPower; // 몬스터의 공격력 (기지에 가해지는 데미지)
     this.speed = monsterData.speed;
+    this.width = monsterData.width; // 몬스터 이미지 가로 길이
+    this.height = monsterData.height; // 몬스터 이미지 세로 길이
+    this.image = monsterImages[monsterData.imageIndex]; // 몬스터 이미지
   }
 
   move(base) {
@@ -57,7 +56,7 @@ export class Monster {
   }
 
   draw(ctx) {
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    ctx.drawImage(this.image, this.x, this.y - this.height / 2, this.width, this.height);
     ctx.font = '12px Arial';
     ctx.fillStyle = 'white';
     ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);

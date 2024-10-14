@@ -4,13 +4,14 @@
   "data": [
     {
       "id": 1001,
-      "hp": 100,
+      "hp": 300,
       "attack_power": 10,
       "stage_id": 100,
       "score": 100,
       "speed": 1,
       "width": 53,
-      "height": 80
+      "height": 80,
+      "imageIndex": 0
     },
     {
       "id": 1002,
@@ -19,8 +20,9 @@
       "stage_id": 101,
       "score": 100,
       "speed": 1.1,
-      "width": 53,
-      "height": 80
+      "width": 120,
+      "height": 100,
+      "imageIndex": 1
     },
     {
       "id": 1003,
@@ -30,7 +32,8 @@
       "score": 100,
       "speed": 1.21,
       "width": 53,
-      "height": 80
+      "height": 80,
+      "imageIndex": 2
     },
     {
       "id": 1004,
@@ -40,7 +43,8 @@
       "score": 100,
       "speed": 1.33,
       "width": 53,
-      "height": 80
+      "height": 80,
+      "imageIndex": 3
     },
     {
       "id": 2001,
@@ -49,8 +53,9 @@
       "stage_id": 100,
       "score": 100,
       "speed": 1,
-      "width": 190,
-      "height": 180
+      "width": 120,
+      "height": 100,
+      "imageIndex": 1
     },
     {
       "id": 2002,
@@ -60,7 +65,8 @@
       "score": 100,
       "speed": 1.1,
       "width": 190,
-      "height": 180
+      "height": 180,
+      "imageIndex": 1
     },
     {
       "id": 2003,
@@ -70,7 +76,8 @@
       "score": 100,
       "speed": 1.21,
       "width": 190,
-      "height": 180
+      "height": 180,
+      "imageIndex": 1
     },
     {
       "id": 2004,
@@ -80,7 +87,8 @@
       "score": 100,
       "speed": 1.33,
       "width": 190,
-      "height": 180
+      "height": 180,
+      "imageIndex": 1
     }
   ]
 }

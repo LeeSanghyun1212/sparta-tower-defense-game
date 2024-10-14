@@ -15,3 +15,9 @@ export const removeUser = (userId) => {
 export const getUsers = () => {
   return users;
 };
+
+export const getUser = (userId) => {
+  const user = users.find((user) => user.userId === userId);
+
+  return user;
+};

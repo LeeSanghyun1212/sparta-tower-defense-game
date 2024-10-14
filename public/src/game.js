@@ -1,5 +1,6 @@
 import { Base } from './base.js';
 import { CLIENT_VERSION } from './constant.js';
+import { stageDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
 import { sendGameStartEvent } from './socket.js';
 import { Tower } from './tower.js';
@@ -18,16 +19,21 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
+let startTimestamp = 0; // 게임 시작 시간
+let timestamp = 0; // 게임 진행 시간
+let goalTimestamp = 0; // 스테이지 목표 시간
 
-let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = 0; // 몬스터 레벨
+
+let stageId = 0;
+let stageChange = false;
+let monsterId = 0; // 몬스터 ID
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
 let score = 0; // 게임 점수
-let highScore = 0; // 기존 최고 점수
+let highScore = 10000; // 기존 최고 점수
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -81,13 +87,63 @@ function generateRandomMonsterPath() {
   return path;
 }
 
+function generateCustomMonsterPath() {
+  const path = [];
+
+  let canvasQuarterWidth = Math.floor(canvas.width / 4);
+  let canvasHalfHeight = Math.floor(canvas.height / 2);
+  let cornerGap = Math.floor(canvasQuarterWidth / 2);
+  let pathGap = 60;
+  let quarterNumber = 0;
+  const isSigned = Math.floor(Math.random() * 2) ? true : false;
+  let yPosArr = [];
+
+  for (let i = 0; i < 3; i++) {
+    const halfHeight = Math.floor(canvas.height / 2);
+    let randomYPos = Math.floor(Math.random() * 300) + 100;
+    if (i % 2 === 0) {
+      randomYPos = isSigned ? halfHeight + randomYPos : halfHeight - randomYPos;
+    } else {
+      randomYPos = isSigned ? halfHeight - randomYPos : halfHeight + randomYPos;
+    }
+    yPosArr.push(randomYPos);
+  }
+  yPosArr.push(Math.floor(canvas.height / 2));
+
+  let currentX = 0;
+  let currentY = canvasHalfHeight;
+
+  path.push({ x: currentX, y: currentY });
+
+  while (currentX < canvas.width) {
+    if (currentX < canvasQuarterWidth * (quarterNumber + 1) - cornerGap) {
+      currentX += pathGap;
+    } else {
+      if (currentY < yPosArr[quarterNumber]) {
+        currentY += pathGap;
+        if (currentY >= yPosArr[quarterNumber]) {
+          quarterNumber += 1;
+        }
+      } else {
+        currentY -= pathGap;
+        if (currentY <= yPosArr[quarterNumber]) {
+          quarterNumber += 1;
+        }
+      }
+    }
+    path.push({ x: currentX, y: currentY });
+  }
+
+  return path;
+}
+
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath();
 }
 
 function drawPath() {
-  const segmentLength = 20; // 몬스터 경로 세그먼트 길이
+  const segmentLength = 60; // 몬스터 경로 세그먼트 길이
   const imageWidth = 60; // 몬스터 경로 이미지 너비
   const imageHeight = 60; // 몬스터 경로 이미지 높이
   const gap = 5; // 몬스터 경로 이미지 겹침 방지를 위한 간격
@@ -103,13 +159,15 @@ function drawPath() {
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // 피타고라스 정리로 두 점 사이의 거리를 구함 (유클리드 거리)
     const angle = Math.atan2(deltaY, deltaX); // 두 점 사이의 각도는 tan-1(y/x)로 구해야 함 (자세한 것은 역삼각함수 참고): 삼각함수는 변의 비율! 역삼각함수는 각도를 구하는 것!
 
-    for (let j = gap; j < distance - gap; j += segmentLength) {
-      // 사실 이거는 삼각함수에 대한 기본적인 이해도가 있으면 충분히 이해하실 수 있습니다.
-      // 자세한 것은 https://thirdspacelearning.com/gcse-maths/geometry-and-measure/sin-cos-tan-graphs/ 참고 부탁해요!
-      const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
-      const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
-      drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle);
-    }
+    // for (let j = gap; j < distance - gap; j += segmentLength) {
+    //   // 사실 이거는 삼각함수에 대한 기본적인 이해도가 있으면 충분히 이해하실 수 있습니다.
+    //   // 자세한 것은 https://thirdspacelearning.com/gcse-maths/geometry-and-measure/sin-cos-tan-graphs/ 참고 부탁해요!
+    //   const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
+    //   const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
+    //   drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle);
+    // }
+
+    ctx.drawImage(pathImage, startX, startY, imageWidth, imageHeight);
   }
 }
 
@@ -142,6 +200,16 @@ function getRandomPositionNearPath(maxDistance) {
   };
 }
 
+function checkPlaceTowerPos(x, y) {
+  const maxDistanceNearPath = 100;
+
+  const result = monsterPath.every((path) => {
+    const distance = Math.sqrt(Math.pow(x - path.x, 2) + Math.pow(y - path.y, 2));
+    return distance > maxDistanceNearPath;
+  });
+  return result;
+}
+
 function placeInitialTowers() {
   /* 
     타워를 초기에 배치하는 함수입니다.
@@ -155,13 +223,13 @@ function placeInitialTowers() {
   }
 }
 
-function placeNewTower() {
+function placeNewTower(x, y) {
   /* 
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
   */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
+  //const { x, y } = getRandomPositionNearPath(200);
+  const tower = new Tower(x, y, 1);
   towers.push(tower);
   tower.draw(ctx, towerImage);
 }
@@ -173,23 +241,33 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  monsters.push(new Monster(monsterPath, monsterImages, monsterId));
 }
 
 function gameLoop() {
+  // 스테이지 경과 시간 text로 출력
+  timestamp = Date.now();
+  const deltaTime = (timestamp - startTimestamp) / 1000;
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
-  ctx.font = '25px Times New Roman';
-  ctx.fillStyle = 'skyblue';
-  ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
-  ctx.fillStyle = 'white';
-  ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
+  ctx.font = '40px Times New Roman';
+  ctx.textAlign = 'left';
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`최고 기록: ${highScore}`, 50, 50); // 최고 기록 표시
+  ctx.fillStyle = 'black';
+  ctx.fillText(`점수: ${score}`, 50, 100); // 현재 스코어 표시
+  ctx.fillStyle = 'black';
+  ctx.fillText(`골드: ${userGold}`, 50, 150); // 골드 표시
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  const stageNumber = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
+  ctx.fillText(`${stageNumber} Stage`, canvas.width / 2, 100, 200); // 최고 기록 표시
+
+  ctx.font = '50px Times New Roman';
+  ctx.fillStyle = 'black';
+  ctx.fillText(`남은 시간 : ${goalTimestamp - Math.floor(deltaTime)}`, canvas.width / 2, 50);
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -227,18 +305,26 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-export function initGameData(data) {
-  console.log('initGameData : ', data);
+function initStageData(data) {
+  stageId = data;
+
+  const stageData = stageDataTable.data.find((stage) => stage.id === stageId);
+  if (!stageData) {
+    throw new Error(`Not Founded stage data`);
+  }
+
+  monsterId = stageData.monster_id;
+  monsterSpawnInterval = stageData.monster_spawn_interval;
+  goalTimestamp = stageData.timestamp;
+  stageChange = true;
+}
+
+function initGameData(data) {
   userGold = data.userGold; // 유저 골드
   baseHp = data.baseHp; // 기지 체력
-
-  towerCost = data.towerCost; // 타워 구입 비용
   numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
-  monsterLevel = data.monsterLevel; // 몬스터 레벨
-  monsterSpawnInterval = data.monsterSpawnInterval; // 몬스터 생성 주기
 
   score = data.score; // 게임 점수
-  highScore = data.highScore; // 기존 최고 점수
 }
 
 export function initGame() {
@@ -246,9 +332,10 @@ export function initGame() {
     return;
   }
 
-  monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
+  //monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
+  monsterPath = generateCustomMonsterPath();
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+  //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
@@ -277,7 +364,8 @@ Promise.all([
 
   serverSocket.on('connection', (data) => {
     console.log('connection Complete');
-    sendGameStartEvent(userId, 11, Date.now());
+    startTimestamp = Date.now();
+    sendGameStartEvent(userId, 11, startTimestamp);
   });
 
   serverSocket.on('response', (data) => {
@@ -289,18 +377,17 @@ Promise.all([
           {
             if (!isInitGame) {
               initGameData(data.initGameData);
+              initStageData(data.stageId);
               initGame();
             }
           }
           break;
-        default:
-          {
-            console.log(`handlerId : ${data.handlerId}`);
-          }
-          break;
+        default: {
+          throw new Error(`Unknown Response : ${data.handlerId}`);
+        }
       }
     } catch (err) {
-      console.error('Response : Not Available data', err, message);
+      console.error('Error => ', err.message);
     }
   });
   /* 
@@ -325,3 +412,14 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+function clickEvent(event) {
+  const dx = event.clientX - ctx.canvas.offsetLeft;
+  const dy = event.clientY - ctx.canvas.offsetTop;
+
+  if (checkPlaceTowerPos(dx, dy)) {
+    placeNewTower(dx, dy);
+  }
+}
+
+canvas.addEventListener('click', clickEvent);
