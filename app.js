@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import { createServer } from 'http';
 import { loadServerGameAssets } from './src/init/asset.js';
 import initSocket from './src/init/socket.js';

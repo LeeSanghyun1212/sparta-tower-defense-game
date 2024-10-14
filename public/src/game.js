@@ -36,12 +36,26 @@ let score = 0; // 게임 점수
 let highScore = 10000; // 기존 최고 점수
 let isInitGame = false;
 
+// 타워 이미지 배열 추가
+const towerImages = {
+  pawnTower: new Image(),
+  rookTower: new Image(),
+  knightTower: new Image(),
+  bishopTower: new Image(),
+  queenTower: new Image(),
+  kingTower: new Image(),
+};
+// 각 타워 이미지 소스 설정
+towerImages.pawnTower.src = 'images/tower_pawn.png';
+towerImages.rookTower.src = 'images/tower_rook.png';
+towerImages.knightTower.src = 'images/tower_knight.png';
+towerImages.bishopTower.src = 'images/tower_bishop.png';
+towerImages.queenTower.src = 'images/tower_queen.png';
+towerImages.kingTower.src = 'images/tower_king.png';
+
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = '../images/bg.webp';
-
-const towerImage = new Image();
-towerImage.src = '../images/tower.png';
 
 const baseImage = new Image();
 baseImage.src = '../images/base.png';
@@ -211,27 +225,33 @@ function checkPlaceTowerPos(x, y) {
 }
 
 function placeInitialTowers() {
-  /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
-  */
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, 1);
+
+    const tower = new Tower(x, y, 0); // 타워 생성
+
     towers.push(tower);
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages.pawnTower); // 기본 타워 이미지 사용
+
+    // 서버에 타워 좌표 전송
+    serverSocket.emit('addTower', { x, y });
   }
 }
 
-function placeNewTower(x, y) {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  //const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y, 1);
+function placeNewTower() {
+  if (userGold < towerCost) {
+    alert('골드가 부족합니다!');
+    return;
+  }
+
+  userGold -= towerCost;
+  const { x, y } = getRandomPositionNearPath(200);
+
+  const towerType = 'pawnTower';
+  const tower = new Tower(x, y);
+
   towers.push(tower);
-  tower.draw(ctx, towerImage);
+  tower.draw(ctx, towerImages[towerType]);
 }
 
 function placeBase() {
@@ -346,7 +366,6 @@ export function initGame() {
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
