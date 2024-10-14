@@ -1,0 +1,26 @@
+{
+  "name": "tower",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1,
+      "attack_power": 40,
+      "range": 300,
+      "cost": 500,
+      "cooldown": 180,
+      "beamDuration": 30,
+      "width": 78,
+      "height": 150
+    },
+    {
+      "id": 2,
+      "attack_power": 50,
+      "range": 310,
+      "cost": 1000,
+      "cooldown": 160,
+      "beamDuration": 60,
+      "width": 78,
+      "height": 150
+    }
+  ]
+}
