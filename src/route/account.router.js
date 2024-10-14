@@ -7,7 +7,7 @@ const router = express.Router();
 //회원가입 API
 router.post("/register", async (req, res, next) => {
   try {
-    const { user_id, password, checkpassword, nickname } = req.body;
+    const { user_id, password, checkpassword} = req.body;
 
     // 아이디 중복 확인
     const isExistUserId = await usersPrisma.users.findFirst({
@@ -19,17 +19,8 @@ router.post("/register", async (req, res, next) => {
         .json({ errorMessage: "이미 존재하는 아이디입니다." });
     }
 
-    //닉네임 중복 확인
-    const isExistNickName = await usersPrisma.users.findFirst({
-      where: { nickname },
-    });
-    if (isExistNickName) {
-      return res
-        .status(409)
-        .json({ errorMessage: "이미 존재하는 닉네임입니다." });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
+
     //비밀번호 확인
     if (password !== checkpassword) {
       return res.status(400).json({
@@ -42,18 +33,12 @@ router.post("/register", async (req, res, next) => {
       data: {
         user_id,
         password: hashedPassword,
-        nickname,
-      },
-      select: {
-        nickname: true,
-        cash: true,
       },
     });
 
     // 유저 데이터 반환
     const accountData = {
-      user_id: account.user_id,
-      nickname: account.nickname, // Corrected typo
+      user_id: account.user_id, // Corrected typo
     };
 
     return res
