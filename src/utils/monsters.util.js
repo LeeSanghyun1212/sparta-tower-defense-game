@@ -12,7 +12,6 @@ export const initCatchMosters = (stageId) => {
     if (stageDataIndex - i < 0) continue;
     catchMonsters.push({ monsterId: stages.data[stageDataIndex - i].monster_id, catchCount: 0 });
   }
-  console.log('두근두근',catchMonsters);
   return catchMonsters;
 };
 

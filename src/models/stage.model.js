@@ -1,4 +1,4 @@
-import { initAttackMonsters, initCatchMosters } from '../utils/monsters.js';
+import { initAttackMonsters, initCatchMosters } from '../utils/monsters.util.js';
 
 // key : userId, value : array -> stage 정보는 복수이기떄문에 배열
 const stages = {};

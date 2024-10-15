@@ -5,8 +5,6 @@ export class Tower {
   static towerData = [];
 
   static loadTowerData(data) {
-    console.log('Loaded tower data:', Tower.towerData);
-
     this.towerData = data;
   }
 

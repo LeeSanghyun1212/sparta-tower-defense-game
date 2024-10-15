@@ -1,12 +1,13 @@
 import { getServerGameAssets } from '../init/asset.js';
+import { getAttackedBase, getCatchMonster } from '../models/monster.model.js';
 import { getCurrentStage, setStage } from '../models/stage.model.js';
 import { getUser } from '../models/user.model.js';
-import { getScore } from '../utils/stage.util.js';
+import { getStageAttackedDamage, getStageScore } from '../utils/stage.util.js';
 
 export const moveStage = (userId, payload) => {
   const { stages } = getServerGameAssets();
   const { stageId, targetStageId, timestamp, score, hp } = payload;
-  
+
   const currentStage = getCurrentStage(userId);
 
   if (!currentStage) {
@@ -30,29 +31,39 @@ export const moveStage = (userId, payload) => {
 
   // 스테이지 점수 유효성 검증
   const clientScore = payload.score - currentStage.score;
-  const serverScore = getScore(currentStage);
-  console.log(`Client Score: ${payload.score}, Server Score: ${serverScore}`);
+  const serverScore = getUser(userId).score - currentStage.score;
+  const userCatchMonsters = getCatchMonster(userId);
+  const serverCalculateScore = getStageScore(userCatchMonsters, stageId);
+  console.log(
+    `Client Score: ${payload.score}, Server Score: ${serverScore}, ServerCalculateScore: ${serverCalculateScore}`,
+  );
+
+  if (serverScore !== serverCalculateScore) {
+    return { status: 'fail', message: 'Server dismatch score' };
+  }
+
   if (clientScore !== serverScore) {
     return { status: 'fail', message: 'Client<->Server dismatch score' };
   }
 
   // 스테이지 베이스캠프 hp 유효성 검증
-  const clientBaseHp = payload.baseHp;
+  const clientBaseHp = payload.hp;
   const serverBaseHp = getUser(userId).baseHp;
-  const serverCalculatedBaseHp = getBaseHp(currentStage);
+  const userAttackedMonsters = getAttackedBase(userId);
+  const serverCalculatedBaseHp =
+    currentStage.baseHp - getStageAttackedDamage(userAttackedMonsters, stageId);
 
   console.log(
     `ClientHp : ${clientBaseHp} | ServerHp : ${serverBaseHp} | ServerCalculateHp : ${serverCalculatedBaseHp}`,
   );
 
-  if (serverCalculatedBaseHp !== serverBaseHp) {
+  if (serverBaseHp !== serverCalculatedBaseHp) {
     return { status: 'fail', message: 'Server dismatch BaseHp' };
   }
 
   if (clientBaseHp !== serverBaseHp) {
     return { status: 'fail', message: 'Client<->Server dismatch BaseHp' };
   }
-  
 
   // 모든 검사를 통과했다면, 다음 스테이지 정보들을 stages에 추가해준다.
   setStage(userId, targetStageId, timestamp, score, hp);

@@ -220,7 +220,6 @@ function checkPlaceTowerPos(x, y) {
 }
 
 function placeNewTower(towerType, x, y) {
-  console.log('Tower type:', towerType);
   const towerData = Tower.getTowerData(towerType); // 타워 데이터 가져오기
   if (!towerData) {
     alert('타워 타입이 유효하지 않습니다!');
@@ -288,7 +287,6 @@ canvas.addEventListener('dragover', (event) => {
 canvas.addEventListener('drop', (event) => {
   event.preventDefault();
   const towerType = event.dataTransfer.getData('text/plain');
-  console.log('Dropped tower type:', towerType);
   const { offsetX, offsetY } = event;
 
   // 타워 배치 위치 유효성 검사

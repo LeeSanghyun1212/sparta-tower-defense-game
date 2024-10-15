@@ -7,11 +7,10 @@ export const getScore = (currentStage) => {
   currentStage.catchMonsters.forEach((catchMonster) => {
     const monsterData = monsters.data.find((monster) => monster.id === catchMonster.monsterId);
     if (!monsterData) {
-        console.log(`Monster not found: ${catchMonster.monsterId}`);
-        return; // 몬스터가 없으면 건너뜁니다.
-      }
+      console.log(`Monster not found: ${catchMonster.monsterId}`);
+      return; // 몬스터가 없으면 건너뜁니다.
+    }
     score += monsterData.score * catchMonster.catchCount;
-    console.log(score);
   });
 
   return score;
@@ -31,34 +30,34 @@ export const getBaseHp = (currentStage) => {
   return baseHp;
 };
 
-export const stageScore = (catchMonsterList, stageId) => {
-    let stageScore = 0;
-    catchMonsterList.forEach((monster) => {
-        if(monster.stageId === stageId){
-            stageScore += monster.monsterScore;
-        }
-    });
-    return stageScore;
-}
+export const getStageScore = (catchMonsterList, stageId) => {
+  let stageScore = 0;
+  catchMonsterList.forEach((monster) => {
+    if (monster.stageLevel === stageId) {
+      stageScore += monster.monsterScore;
+    }
+  });
+  return stageScore;
+};
 
 //catchMonsterList = getCatchMonsters() 필요
-export const stageGold = (catchMonsterList, stageId) => {
-    let stageGold = 0;
-    catchMonsterList.forEach((monster) => {
-        if(monster.stageId === stageId){
-            stageGold += monster.monsterGold;
-        }
-    });
-    return stageGold;
-}
+export const getStageGold = (catchMonsterList, stageId) => {
+  let stageGold = 0;
+  catchMonsterList.forEach((monster) => {
+    if (monster.stageLevel === stageId) {
+      stageGold += monster.monsterGold;
+    }
+  });
+  return stageGold;
+};
 
 //attackedBaseList = getAttackedBase() 필요
-export const stageAttackedDamage = (attackedBaseList, stageId) => {
-    let stageAttackedDamage = 0;
-    attackedBaseList.forEach((monster) => {
-        if(monster.stageId === stageId) {
-            stageAttackedDamage += monster.attackedDamage;
-        }
-    })
-    return stageAttackedDamage;
-}
+export const getStageAttackedDamage = (attackedBaseList, stageId) => {
+  let stageAttackedDamage = 0;
+  attackedBaseList.forEach((monster) => {
+    if (monster.stageLevel === stageId) {
+      stageAttackedDamage += monster.attackedDamage;
+    }
+  });
+  return stageAttackedDamage;
+};
