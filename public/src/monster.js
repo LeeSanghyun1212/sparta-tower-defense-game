@@ -18,15 +18,7 @@ export class Monster {
     this.isSlowed = false;
     this.slowDuration = 0;
   }
-  update() {
-    if (this.isSlowed) {
-      this.slowDuration--;
-      if (this.slowDuration <= 0) {
-        this.isSlowed = false;
-        this.speed = monsterData.speed; // 원래 속도로 복구
-      }
-    }
-  }
+
   init(monsterImages, level) {
     const monsterData = monsterDataTable.data.find((monster) => monster.id === this.id);
     if (!monsterData) {
@@ -63,6 +55,23 @@ export class Monster {
       let isAttacked = true;
       return isAttacked;
     }
+  }
+
+  update() {
+    // 슬로우 상태 업데이트
+    if (this.isSlowed) {
+      this.slowDuration--;
+      if (this.slowDuration <= 0) {
+        this.isSlowed = false;
+        this.speed = monsterDataTable.data.find((monster) => monster.id === this.id).speed; // 원래 속도로 복구
+      }
+    }
+  }
+
+  applySlow(slowAmount, duration) {
+    this.speed *= slowAmount; // 속도 감소
+    this.isSlowed = true; // 슬로우 상태 설정
+    this.slowDuration = duration; // 슬로우 지속 시간 설정
   }
 
   draw(ctx) {
