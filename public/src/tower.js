@@ -77,6 +77,9 @@ export class Tower {
   }
 
   upgrade() {
+    if (!this.towerLevel) {
+      this.towerLevel = 1;
+    }
     if (this.towerLevel < 3) {
       this.towerLevel++;
       if (this.towerLevel === 2) {
