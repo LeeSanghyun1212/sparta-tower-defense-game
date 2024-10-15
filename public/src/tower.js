@@ -10,8 +10,6 @@ export class Tower {
   }
 
   static getTowerData(towerType) {
-    console.log(towerType);
-    // http://localhost:3000/images/tower_pawnTower.png
     const splitTowerData = towerType.split('/');
     const fileName = splitTowerData[splitTowerData.length - 1];
     const towerName = fileName.slice(6, -4);
