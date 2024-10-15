@@ -77,9 +77,10 @@ router.post("/login", async (req, res) => {
     }
 
     // 3) jwt 토큰 생성
+    const oneHour = 60 * 60 * 1000;
     const token = jwt.sign({ loginId: account.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie("authorization", `Bearer ${token}`, { maxAge: 10000 });
-    res.cookie('nickname', account.nickname,{ maxAge: 10000,});
+    res.cookie("authorization", `Bearer ${token}`, { maxAge: oneHour });
+    res.cookie('nickname', account.nickname,{ maxAge: oneHour,});
     return res.status(200).json({ message: "로그인에 성공했습니다." });
   } catch (error) {
     console.error("Error during login:", error);
