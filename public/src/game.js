@@ -1,6 +1,6 @@
 import { Base } from './base.js';
 import { CLIENT_VERSION } from './constant.js';
-import { stageDataTable } from './init/asset.js';
+import { stageDataTable, towerDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
 import { sendEvent, sendGameStartEvent } from './socket.js';
 import {
@@ -232,47 +232,8 @@ function placeNewTower(towerType, x, y) {
     alert('골드가 부족합니다!');
     return;
   }
-
-  userGold -= towerData.cost;
-  let tower = null;
-  switch (towerData.type) {
-    case 'pawnTower':
-      {
-        tower = new pawnTower(x, y, towerData.type);
-      }
-      break;
-    case 'rookTower':
-      {
-        tower = new rookTower(x, y, towerData.type);
-      }
-      break;
-    case 'knightTower':
-      {
-        tower = new knightTower(x, y, towerData.type);
-      }
-      break;
-    case 'bishopTower':
-      {
-        tower = new bishopTower(x, y, towerData.type);
-      }
-      break;
-    case 'queenTower':
-      {
-        tower = new queenTower(x, y, towerData.type);
-      }
-      break;
-    case 'kingTower':
-      {
-        tower = new kingTower(x, y, towerData.type);
-      }
-      break;
-    default: {
-      console.log('Unknown Tower Type : ', towerData.type);
-    }
-  }
-
-  towers.push(tower);
-  tower.draw(ctx, towerImages);
+  const payload = { userGold, towerId: towerData.id, x, y };
+  sendEvent(userId, 22, payload);
 }
 
 function placeBase() {
@@ -358,8 +319,7 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const {isDestroyed, isAttacked} = monster.move(base);
-      console.log("테스트",isDestroyed,isAttacked);
+      const { isDestroyed, isAttacked } = monster.move(base);
       if (!isDestroyed && isAttacked) {
         // 기지에 자폭한 몬스터 제거
         sendEvent(userId, 32, {
@@ -391,7 +351,6 @@ function gameLoop() {
       });
       monsters.splice(i, 1);
       score += monster.score;
-      userGold += monster.gold;
       if (score >= highScore) {
         highScore = score;
       }
@@ -503,9 +462,58 @@ Promise.all([
               }
             }
             break;
+          case 22:
+            {
+              userGold = data.userGold;
+
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              let tower = null;
+              switch (towerData.type) {
+                case 'pawnTower':
+                  {
+                    tower = new pawnTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'rookTower':
+                  {
+                    tower = new rookTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'knightTower':
+                  {
+                    tower = new knightTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'bishopTower':
+                  {
+                    tower = new bishopTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'queenTower':
+                  {
+                    tower = new queenTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'kingTower':
+                  {
+                    tower = new kingTower(x, y, towerData.type);
+                  }
+                  break;
+                default: {
+                  console.log('Unknown Tower Type : ', towerData.type);
+                }
+              }
+              towers.push(tower);
+              tower.draw(ctx, towerImages);
+            }
+            break;
           case 31:
             {
               score = data.score;
+              userGold = data.userGold;
             }
             break;
           case 32:
@@ -513,7 +521,7 @@ Promise.all([
               base.hp = data.baseHp;
             }
             break;
-            case 41:
+          case 41:
             {
               highScore = data.highScore;
             }

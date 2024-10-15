@@ -37,7 +37,7 @@ export const catchMonster = (userId, payload) => {
   }
 
   // 몬스터별 골드 유효성 검사
-  if (Math.abs(monsterData.gold + monsterLevel*5 - monsterGold) > 5) {
+  if (Math.abs(monsterData.gold + monsterLevel * 5 - monsterGold) > 5) {
     return { status: 'fail', message: '몬스터 골드가 비정상적인 값입니다.' };
   }
 
@@ -48,11 +48,12 @@ export const catchMonster = (userId, payload) => {
 
   const user = getUser(userId);
   user.score += monsterScore;
+  user.userGold += monsterData.gold;
 
   const serverTime = Date.now();
   setCatchMonster(userId, stageId, monsterId, monsterLevel, monsterGold, monsterScore, serverTime); // 유저의 현재 스테이지레벨, 몬스터번호, 몬스터레벨, 점수, 잡은 시간을 기록
 
-  return { status: 'success', handlerId: 31, score: user.score };
+  return { status: 'success', handlerId: 31, score: user.score, userGold: user.userGold };
 };
 
 export const attackedBase = (userId, payload) => {

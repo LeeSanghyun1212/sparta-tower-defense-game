@@ -251,7 +251,7 @@ export class queenTower extends Tower {
 
       this.frameCounting += 1;
 
-      if (this.frameCounting === 30) {
+      if (this.frameCounting === 10) {
         this.target.hp -= this.startAttackPower;
         this.startAttackPower += 1;
         this.frameCounting = 0;
