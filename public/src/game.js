@@ -15,7 +15,6 @@ import {
 
 let userId;
 let isConnectionHandled = false;
-
 export let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -308,10 +307,21 @@ function gameLoop() {
   if (checkGameOver()) {
     return;
   }
-
   // 스테이지 경과 시간 text로 출력
   timestamp = Date.now();
   const deltaTime = (timestamp - startTimestamp) / 1000;
+  const currentStageIndex = stageDataTable.data.findIndex((stage) => stage.id === stageId);
+  const targetStageId = stageDataTable.data[currentStageIndex + 1].id;
+  if (deltaTime > goalTimestamp) {
+    sendEvent(userId, 13, {
+      stageId,
+      targetStageId,
+      timestamp,
+      score,
+      hp : base.hp,
+    });
+  }
+
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
@@ -358,8 +368,7 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const {isDestroyed, isAttacked} = monster.move(base);
-      console.log("테스트",isDestroyed,isAttacked);
+      const { isDestroyed, isAttacked } = monster.move(base);
       if (!isDestroyed && isAttacked) {
         // 기지에 자폭한 몬스터 제거
         sendEvent(userId, 32, {
@@ -414,12 +423,10 @@ function checkGameOver() {
 
 function initStageData(data) {
   stageId = data;
-
   const stageData = stageDataTable.data.find((stage) => stage.id === stageId);
   if (!stageData) {
     throw new Error(`Not Founded stage data`);
   }
-
   monsterId = stageData.monster_id;
   monsterSpawnInterval = stageData.monster_spawn_interval;
   goalTimestamp = stageData.timestamp;
@@ -503,6 +510,11 @@ Promise.all([
               }
             }
             break;
+          case 13: 
+            {
+              initStageData(data.stageId);
+              break;
+            }
           case 31:
             {
               score = data.score;
@@ -513,7 +525,7 @@ Promise.all([
               base.hp = data.baseHp;
             }
             break;
-            case 41:
+          case 41:
             {
               highScore = data.highScore;
             }
