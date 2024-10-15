@@ -152,22 +152,6 @@
           .catch((error) => console.error('Error loading tower data:', error));
       });
 
-      // // 업그레이드 버튼 클릭 이벤트 처리
-      // document.getElementById('upgradeTowerButton').addEventListener('click', () => {
-      //   if (selectedTower) {
-      //     // 선택된 타워가 있는 경우
-      //     if (userGold >= selectedTower.upgradeCost) {
-      //       selectedTower.upgrade(); // 타워 업그레이드
-      //       userGold -= selectedTower.upgradeCost; // 골드 차감
-      //       console.log(`타워 업그레이드 완료: 현재 레벨 ${selectedTower.towerLevel}`);
-      //     } else {
-      //       alert('골드가 부족하여 업그레이드할 수 없습니다!');
-      //     }
-      //   } else {
-      //     alert('업그레이드할 타워를 선택해주세요!');
-      //   }
-      // });
-
       const createDraggableImage = (towerType) => {
         const img = new Image();
         img.src = `images/tower_${towerType}.png`; // 타워 이미지 경로 설정
