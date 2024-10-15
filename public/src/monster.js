@@ -17,6 +17,7 @@ export class Monster {
     this.init(monsterImages, this.level);
     this.isSlowed = false;
     this.slowDuration = 0;
+    this.originalSpeed = this.speed;
   }
 
   init(monsterImages, level) {
@@ -35,6 +36,7 @@ export class Monster {
     this.score = monsterData.score + level * 10;
   }
   move() {
+    const effectiveSpeed = this.isSlowed ? this.speed * (1 - this.slowAmount) : this.speed;
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -42,13 +44,13 @@ export class Monster {
       // 2차원 좌표계에서 두 점 사이의 거리를 구할 땐 피타고라스 정리를 활용하면 됩니다! a^2 = b^2 + c^2니까 루트를 씌워주면 되죠!
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-      if (distance < this.speed) {
+      if (distance < effectiveSpeed) {
         // 거리가 속도보다 작으면 다음 지점으로 이동시켜주면 됩니다!
         this.currentIndex++;
       } else {
         // 거리가 속도보다 크면 일정한 비율로 이동하면 됩니다. 이 때, 단위 벡터와 속도를 곱해줘야 해요!
-        this.x += (deltaX / distance) * this.speed; // 단위 벡터: deltaX / distance
-        this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
+        this.x += (deltaX / distance) * effectiveSpeed; // 단위 벡터: deltaX / distance
+        this.y += (deltaY / distance) * effectiveSpeed; // 단위 벡터: deltaY / distance
       }
       return false;
     } else {
@@ -63,15 +65,15 @@ export class Monster {
       this.slowDuration--;
       if (this.slowDuration <= 0) {
         this.isSlowed = false;
-        this.speed = monsterDataTable.data.find((monster) => monster.id === this.id).speed; // 원래 속도로 복구
+        this.speed = this.originalSpeed; // 원래 속도로 복구
       }
     }
   }
 
-  applySlow(slowAmount, duration) {
-    this.speed *= slowAmount; // 속도 감소
-    this.isSlowed = true; // 슬로우 상태 설정
-    this.slowDuration = duration; // 슬로우 지속 시간 설정
+  applySlow(amount, duration) {
+    this.isSlowed = true;
+    this.slowDuration = duration;
+    this.speed *= 1 - amount; // 속도 감소
   }
 
   draw(ctx) {
