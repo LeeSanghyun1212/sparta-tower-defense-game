@@ -359,6 +359,7 @@ function gameLoop() {
     const monster = monsters[i];
     if (monster.hp > 0) {
       const {isDestroyed, isAttacked} = monster.move(base);
+      console.log("테스트",isDestroyed,isAttacked);
       if (!isDestroyed && isAttacked) {
         // 기지에 자폭한 몬스터 제거
         sendEvent(userId, 32, {

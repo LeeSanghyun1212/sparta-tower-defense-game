@@ -54,7 +54,9 @@ export class Monster {
       }
       return false;
     } else {
-      return true; // 목표 지점 도착 시 처리
+      const isDestroyed = base.takeDamage(this.attackPower);
+      const isAttacked = true;
+      return { isDestroyed, isAttacked }; // 목표 지점 도착 시 처리
     }
   }
 
@@ -76,9 +78,6 @@ export class Monster {
     } else {
       // 슬로우가 이미 적용된 상태라면, 남은 지속 시간을 연장할 수 있습니다.
       this.slowDuration = Math.max(this.slowDuration, duration);
-      const isDestroyed = base.takeDamage(this.attackPower);
-      const isAttacked = true;
-      return {isDestroyed, isAttacked};
     }
   }
 
