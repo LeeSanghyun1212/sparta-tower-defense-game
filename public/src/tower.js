@@ -44,6 +44,7 @@ export class Tower {
   draw(ctx, towerImage) {
     ctx.drawImage(
       towerImage,
+
       this.x - this.width / 2,
       this.y - this.height / 2,
       this.width,
