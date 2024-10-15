@@ -47,12 +47,12 @@ const towerImages = {
 };
 
 // 각 타워 이미지 소스 설정
-towerImages.pawnTower.src = '../images/tower_pawn.png';
-towerImages.rookTower.src = '../images/tower_rook.png';
-towerImages.knightTower.src = '../images/tower_knight.png';
-towerImages.bishopTower.src = '../images/tower_bishop.png';
-towerImages.queenTower.src = '../images/tower_queen.png';
-towerImages.kingTower.src = '../images/tower_king.png';
+towerImages.pawnTower.src = '../images/tower_pawnTower.png';
+towerImages.rookTower.src = '../images/tower_rookTower.png';
+towerImages.knightTower.src = '../images/tower_knightTower.png';
+towerImages.bishopTower.src = '../images/tower_bishopTower.png';
+towerImages.queenTower.src = '../images/tower_queenTower.png';
+towerImages.kingTower.src = '../images/tower_kingTower.png';
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -213,21 +213,6 @@ function checkPlaceTowerPos(x, y) {
     return distance > maxDistanceNearPath;
   });
 }
-function placeInitialTowers() {
-  for (let i = 0; i < numOfInitialTowers; i++) {
-    const { x, y } = getRandomPositionNearPath(200);
-
-    // 기본 타워 타입을 'pawnTower'로 설정
-    const towerType = 'pawnTower';
-    const tower = new Tower(x, y, towerType); // 타워 생성
-
-    towers.push(tower);
-    tower.draw(ctx, towerImages[towerType]); // 기본 타워 이미지 사용
-
-    // 서버에 타워 좌표 전송
-    serverSocket.emit('addTower', { x, y });
-  }
-}
 
 function placeNewTower(towerType, x, y) {
   console.log('Tower type:', towerType);
@@ -263,6 +248,7 @@ canvas.addEventListener('dragover', (event) => {
 canvas.addEventListener('drop', (event) => {
   event.preventDefault();
   const towerType = event.dataTransfer.getData('text/plain');
+  console.log('Dropped tower type:', towerType);
   const { offsetX, offsetY } = event;
 
   // 타워 배치 위치 유효성 검사

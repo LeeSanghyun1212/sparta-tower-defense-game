@@ -11,8 +11,8 @@
       "cooldown": 180,
       "beamDuration": 30,
       "upgradeCost": 50,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     },
     {
       "id": 2,
@@ -23,8 +23,8 @@
       "cooldown": 160,
       "beamDuration": 60,
       "upgradeCost": 50,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     },
     {
       "id": 3,
@@ -35,8 +35,8 @@
       "cooldown": 300,
       "beamDuration": 60,
       "upgradeCost": 50,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     },
     {
       "id": 4,
@@ -47,8 +47,8 @@
       "cooldown": 60,
       "beamDuration": 30,
       "upgradeCost": 50,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     },
     {
       "id": 5,
@@ -59,8 +59,8 @@
       "cooldown": 60,
       "beamDuration": 60,
       "upgradeCost": 150,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     },
     {
       "id": 6,
@@ -71,8 +71,8 @@
       "cooldown": 60,
       "beamDuration": 60,
       "upgradeCost": 150,
-      "width": 78,
-      "height": 150
+      "width": 50,
+      "height": 100
     }
   ]
 }

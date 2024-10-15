@@ -4,9 +4,16 @@ export class Tower {
   static towerData = [];
 
   static loadTowerData(data) {
-    Tower.towerData = data;
+    console.log('Loaded tower data:', Tower.towerData);
+
+    this.towerData = data;
   }
 
+  static getTowerData(towerType) {
+    const tower = this.towerData.find((t) => t.type === towerType);
+    console.log(`Getting tower data for type: ${towerType}`, tower); // 추가된 로그
+    return tower;
+  }
   constructor(x, y, towerType) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
     this.x = x; // 타워 이미지 x 좌표
@@ -14,9 +21,6 @@ export class Tower {
     this.type = towerType;
     this.target = null; // 타워 광선의 목표
     this.init();
-  }
-  static getTowerData(type) {
-    return Tower.towerData.find((tower) => tower.type === type);
   }
 
   init() {

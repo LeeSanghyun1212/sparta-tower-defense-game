@@ -63,6 +63,7 @@
     </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
+      import { Tower } from './src/tower.js';
       let selectedTower = null;
 
       document.getElementById('registerButton').addEventListener('click', () => {
@@ -78,7 +79,14 @@
         document.getElementById('gameCanvas').style.display = 'block';
         document.querySelector('.upgrade-container').style.display = 'block';
         document.getElementById('tower-buttons').style.display = 'block';
-        import('./src/game.js');
+        fetch('./assets/tower.json')
+          .then((response) => response.json())
+          .then((data) => {
+            Tower.loadTowerData(data.data);
+            console.log('Loaded tower data:', Tower.towerData);
+            import('./src/game.js');
+          })
+          .catch((error) => console.error('Error loading tower data:', error));
       });
 
       // 업그레이드 버튼 클릭 이벤트 처리
