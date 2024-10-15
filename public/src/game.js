@@ -28,10 +28,8 @@ let startTimestamp = 0; // 게임 시작 시간
 let timestamp = 0; // 게임 진행 시간
 let goalTimestamp = 0; // 스테이지 목표 시간
 
-let numOfInitialTowers = 0; // 초기 타워 개수
-
 let stageId = 0;
-let stageChange = true;
+let stageChange = false;
 let monsterId = 0; // 몬스터 ID
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
@@ -390,6 +388,7 @@ function initStageData(data) {
   }
   monsterId = stageData.monster_id;
   monsterSpawnInterval = stageData.monster_spawn_interval;
+  console.log(monsterSpawnInterval);
   goalTimestamp = stageData.timestamp;
   stageChange = true;
 }
@@ -397,7 +396,6 @@ function initStageData(data) {
 function initGameData(data) {
   userGold = data.userGold; // 유저 골드
   baseHp = data.baseHp; // 기지 체력
-  numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
   score = data.score; // 게임 점수
 }
 
@@ -405,12 +403,14 @@ export function initGame() {
   if (isInitGame) {
     return;
   }
-
+  
   //monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   monsterPath = generateCustomMonsterPath();
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
+
+  
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;

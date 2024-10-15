@@ -13,6 +13,7 @@ export class Monster {
     this.x = path[0].x;
     this.y = path[0].y;
     this.level = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
+
     this.init(monsterImages, this.level);
 
     this.isSlowed = false;
@@ -26,16 +27,16 @@ export class Monster {
       console.log(`Not Found Monster Data : id [${id}]`);
       return;
     }
-    this.maxHp = monsterData.hp + level * 10;
+    this.maxHp = monsterData.hp + level * 20;
     this.hp = this.maxHp;
     this.attackPower = monsterData.attackPower + level * 5;
-    this.speed = monsterData.speed;
+    this.speed = monsterData.speed + level * 0.25;
     this.originalSpeed = this.speed; // 원래 속도 저장
     this.width = monsterData.width;
     this.height = monsterData.height;
     this.image = monsterImages[monsterData.imageIndex];
     this.score = monsterData.score + level * 10;
-    this.gold = monsterData.gold + level * 5;
+    this.gold = monsterData.gold + level * 1;
   }
 
   move(base) {
