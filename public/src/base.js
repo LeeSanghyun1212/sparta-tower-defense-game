@@ -1,4 +1,4 @@
-import { sendEvent } from "./socket.js";
+import { sendEvent } from './socket.js';
 
 export class Base {
   constructor(x, y, maxHp) {
@@ -29,12 +29,9 @@ export class Base {
     );
   }
 
-  takeDamage(stageLevel, attackedDamage) {
-    // 기지가 데미지를 입는 메소드입니다.
+  destroyed() {
+    // 기지가 파괴되었는지를 구분하는 메소드입니다.
     // 몬스터가 기지의 HP를 감소시키고, HP가 0 이하가 되면 게임 오버 처리를 해요!
-    this.hp -= attackedDamage;
-    // 스테이지 레벨, 받은 피해량, 남은 기지 체력 데이터를 전달
-    sendEvent(12, {stageLevel, attackedDamage, baseHp: this.hp})
-    return this.hp <= 0; // 기지의 HP가 0 이하이면 true, 아니면 false
+    return this.hp <= 0;
   }
 }

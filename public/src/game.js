@@ -261,7 +261,7 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterId));
+  monsters.push(new Monster(monsterPath, monsterImages, monsterId, stageId));
 }
 
 function gameLoop() {
@@ -304,24 +304,38 @@ function gameLoop() {
   });
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
+
   base.draw(ctx, baseImage);
 
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isDestroyed = monster.move(stageNumber, base);
+      const isAttacked = monster.move();
+      if (isAttacked) {
+        // 기지에 자폭한 몬스터 제거
+        sendEvent(userId, 32, {
+          stageId: stageId,
+          monsterId: monster.id,
+          monsterLevel: monster.level,
+          attackedDamage: monster.attackPower,
+        });
+        monsters.splice(i, 1);
+      }
+
+      const isDestroyed = base.destroyed();
       if (isDestroyed) {
         /* 게임 오버 */
+        monsters.splice(0);
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         location.reload();
       }
+
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
-      score += monster.score;
       sendEvent(userId, 31, {
-        stageLevel: stageId,
-        monsterNumber: monster.monsterNumber,
+        stageId: stageId,
+        monsterId: monster.id,
         monsterLevel: monster.level,
         monsterScore: monster.score,
       });
@@ -410,10 +424,12 @@ Promise.all([
           break;
         case 31:
           {
+            score = data.score;
           }
           break;
         case 32:
           {
+            base.hp = data.baseHp;
           }
           break;
         default: {
