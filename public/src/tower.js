@@ -1,5 +1,4 @@
 import { towerDataTable } from './init/asset.js';
-import { monsterDataTable } from './init/asset.js';
 
 export class Tower {
   static towerData = [];
@@ -22,12 +21,14 @@ export class Tower {
     this.y = y; // 타워 이미지 y 좌표
     this.type = towerType;
     this.target = null; // 타워 광선의 목표
-    this.level = 1;
     this.upgradeCost = 50;
+    this.level = 1;
     this.init();
   }
+
   upgrade(level) {
     const towerData = towerDataTable.data.find((tower) => tower.type === this.type);
+
     this.level = level;
     this.attackPower = towerData.attack_power + 10 * (this.level - 1); //타워 공격력
     this.range = towerData.range + 10 * (this.level - 1); // 타워 사거리
@@ -59,6 +60,16 @@ export class Tower {
       this.width,
       this.height,
     );
+
+    ctx.font = '20px Times New Roman';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'yellow';
+    let levelText = '';
+    for (let i = 0; i < this.level; i++) {
+      levelText += '★';
+    }
+    ctx.fillText(`${levelText}`, this.x, this.y - this.height / 2);
+
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
@@ -144,6 +155,16 @@ export class knightTower extends Tower {
       this.width,
       this.height,
     );
+
+    ctx.font = '20px Times New Roman';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'yellow';
+    let levelText = '';
+    for (let i = 0; i < this.level; i++) {
+      levelText += '★';
+    }
+    ctx.fillText(`${levelText}`, this.x, this.y - this.height / 2);
+
     if (this.beamDuration > 0 && this.targets.length > 0) {
       this.targets.forEach((target) => {
         ctx.beginPath();
@@ -189,6 +210,16 @@ export class bishopTower extends Tower {
       this.width,
       this.height,
     );
+
+    ctx.font = '20px Times New Roman';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'yellow';
+    let levelText = '';
+    for (let i = 0; i < this.level; i++) {
+      levelText += '★';
+    }
+    ctx.fillText(`${levelText}`, this.x, this.y - this.height / 2);
+
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y); // 타워 위치에서 시작
@@ -211,10 +242,12 @@ export class queenTower extends Tower {
     this.frameCounting = 0;
     console.log(this.frameCounting);
   }
+
   upgrade(level) {
     const towerData = towerDataTable.data.find((tower) => tower.type === this.type);
+
     this.level = level;
-    this.attackPower = towerData.attack_power + 2 * (this.level - 1); //타워 공격력
+    this.attackPower = towerData.attack_power + (this.level - 1); //타워 공격력
     this.range = towerData.range + 10 * (this.level - 1); // 타워 사거리
   }
 
@@ -234,6 +267,16 @@ export class queenTower extends Tower {
       this.width,
       this.height,
     );
+
+    ctx.font = '20px Times New Roman';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'yellow';
+    let levelText = '';
+    for (let i = 0; i < this.level; i++) {
+      levelText += '★';
+    }
+    ctx.fillText(`${levelText}`, this.x, this.y - this.height / 2);
+
     if (this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
