@@ -207,7 +207,7 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function checkPlaceTowerPos(x, y) {
-  const maxDistanceNearPath = 100; // 타워 배치 가능 거리
+  const maxDistanceNearPath = 70; // 타워 배치 가능 거리
   return monsterPath.every(({ x: pathX, y: pathY }) => {
     const distance = Math.sqrt(Math.pow(x - pathX, 2) + Math.pow(y - pathY, 2));
     return distance > maxDistanceNearPath;
@@ -229,9 +229,9 @@ function placeNewTower(towerType, x, y) {
 
   userGold -= towerData.cost;
 
-  const tower = new Tower(x, y, towerType); // 타워 생성
+  const tower = new Tower(x, y, towerData.type); // 타워 생성
   towers.push(tower);
-  tower.draw(ctx, towerImages[towerType]);
+  tower.draw(ctx, towerImages);
 }
 
 function placeBase() {
@@ -290,7 +290,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImages.pawnTower);
+    tower.draw(ctx, towerImages);
     tower.updateCooldown();
     monsters.forEach((monster) => {
       const distance = Math.sqrt(

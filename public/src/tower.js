@@ -10,8 +10,13 @@ export class Tower {
   }
 
   static getTowerData(towerType) {
-    const tower = this.towerData.find((t) => t.type === towerType);
-    console.log(`Getting tower data for type: ${towerType}`, tower); // 추가된 로그
+    console.log(towerType);
+    // http://localhost:3000/images/tower_pawnTower.png
+    const splitTowerData = towerType.split('/');
+    const fileName = splitTowerData[splitTowerData.length - 1];
+    const towerName = fileName.slice(6, -4);
+
+    const tower = this.towerData.find((t) => t.type === towerName);
     return tower;
   }
   constructor(x, y, towerType) {
@@ -24,7 +29,7 @@ export class Tower {
   }
 
   init() {
-    const towerData = Tower.getTowerData(this.type);
+    const towerData = towerDataTable.data.find((tower) => tower.type === this.type);
     if (!towerData) {
       console.log(`Not Fonud tower Data : type [${this.type}]`);
       return;
@@ -41,10 +46,9 @@ export class Tower {
     this.beamDuration = towerData.beamDuration; // 타워 광선 지속 시간
   }
 
-  draw(ctx, towerImage) {
+  draw(ctx, towerImages) {
     ctx.drawImage(
-      towerImage,
-
+      towerImages[`${this.type}`],
       this.x - this.width / 2,
       this.y - this.height / 2,
       this.width,
