@@ -1,7 +1,8 @@
 import { monsterDataTable } from './init/asset.js';
+import { stageDataTable } from './init/asset.js';
 
 export class Monster {
-  constructor(path, monsterImages, id) {
+  constructor(path, monsterImages, id, stageId) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
       throw new Error('몬스터가 이동할 경로가 필요합니다.');
@@ -12,7 +13,8 @@ export class Monster {
     this.currentIndex = 0; // 몬스터가 이동 중인 경로의 인덱스
     this.x = path[0].x; // 몬스터의 x 좌표 (최초 위치는 경로의 첫 번째 지점)
     this.y = path[0].y; // 몬스터의 y 좌표 (최초 위치는 경로의 첫 번째 지점)
-    this.init(monsterImages, 1);
+    this.level = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
+    this.init(monsterImages, this.level);
   }
 
   init(monsterImages, level) {
@@ -21,17 +23,16 @@ export class Monster {
       console.log(`Not Fonud Monster Data : id [${id}]`);
       return;
     }
-    this.maxHp = monsterData.hp + 10 * level; // 몬스터의 현재 HP
+    this.maxHp = monsterData.hp + level * 10; // 몬스터의 현재 HP
     this.hp = this.maxHp; // 몬스터의 현재 HP
-    this.attackPower = monsterData.attack_power * level ; // 몬스터의 공격력 (기지에 가해지는 데미지)
+    this.attackPower = monsterData.attackPower + level * 5; // 몬스터의 공격력 (기지에 가해지는 데미지)
     this.speed = monsterData.speed;
     this.width = monsterData.width; // 몬스터 이미지 가로 길이
     this.height = monsterData.height; // 몬스터 이미지 세로 길이
     this.image = monsterImages[monsterData.imageIndex]; // 몬스터 이미지
-    this.score = monsterData.score;
+    this.score = monsterData.score + level * 10;
   }
-
-  move(base) {
+  move() {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -48,10 +49,9 @@ export class Monster {
         this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
       }
       return false;
-    } else {
-      const isDestroyed = base.takeDamage(this.attackPower); // 기지에 도달하면 기지에 데미지를 입힙니다! 기지의 체력이 0이하이면 true 반환으로 패배 아니면 정상진행
-      this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
-      return isDestroyed;
+    } else {    
+      let isAttacked = true;
+      return isAttacked;
     }
   }
 

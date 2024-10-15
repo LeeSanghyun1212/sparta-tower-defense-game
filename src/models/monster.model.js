@@ -10,8 +10,8 @@ export const getCatchMonster = (uuid) => {
 };
 
 // 몬스터 킬 점수를 획득한 데이터를 기록
-export const setCatchMonster = (uuid, stageLevel, monsterNumber, monsterLevel, monsterScore, timestamp) => {
-  return catchMonsters[uuid].push({ stageLevel, monsterNumber, monsterLevel, monsterScore, timestamp });
+export const setCatchMonster = (uuid, stageLevel, monsterId, monsterLevel, monsterScore, timestamp) => {
+  return catchMonsters[uuid].push({ stageLevel, monsterId, monsterLevel, monsterScore, timestamp });
 };
 
 export const clearCatchMonster = (uuid) => {
@@ -27,8 +27,8 @@ export const getAttackedBase = (uuid) => {
 };
 
 // 몬스터가 기지에서 자폭한 데이터를 기록
-export const setAttackedBase = (uuid, stageLevel, baseHp, attackedDamage, timestamp) => {
-  return attackedBase[uuid].push({ stageLevel, baseHp, attackedDamage, timestamp });
+export const setAttackedBase = (uuid, stageLevel, monsterId, monsterLevel, attackedDamage, baseHp, timestamp) => {
+  return attackedBase[uuid].push({ stageLevel, monsterId, monsterLevel, attackedDamage, baseHp, timestamp });
 };
 
 export const clearAttackedBase = (uuid) => {

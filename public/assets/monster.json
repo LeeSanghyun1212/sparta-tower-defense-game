@@ -4,8 +4,8 @@
   "data": [
     {
       "id": 1001,
-      "hp": 300,
-      "attack_power": 10,
+      "hp": 100,
+      "attackPower": 10,
       "stage_id": 100,
       "score": 100,
       "speed": 100,
@@ -16,7 +16,7 @@
     {
       "id": 1002,
       "hp": 110,
-      "attack_power": 11,
+      "attackPower": 11,
       "stage_id": 101,
       "score": 100,
       "speed": 1.1,
@@ -27,7 +27,7 @@
     {
       "id": 1003,
       "hp": 121,
-      "attack_power": 12,
+      "attackPower": 12,
       "stage_id": 102,
       "score": 100,
       "speed": 1.21,
@@ -38,7 +38,7 @@
     {
       "id": 1004,
       "hp": 133,
-      "attack_power": 13,
+      "attackPower": 13,
       "stage_id": 103,
       "score": 100,
       "speed": 1.33,
@@ -49,7 +49,7 @@
     {
       "id": 2001,
       "hp": 200,
-      "attack_power": 10,
+      "attackPower": 10,
       "stage_id": 100,
       "score": 100,
       "speed": 1,
@@ -60,7 +60,7 @@
     {
       "id": 2002,
       "hp": 220,
-      "attack_power": 11,
+      "attackPower": 11,
       "stage_id": 101,
       "score": 100,
       "speed": 1.1,
@@ -71,7 +71,7 @@
     {
       "id": 2003,
       "hp": 240,
-      "attack_power": 12,
+      "attackPower": 12,
       "stage_id": 102,
       "score": 100,
       "speed": 1.21,
@@ -82,7 +82,7 @@
     {
       "id": 2004,
       "hp": 320,
-      "attack_power": 13,
+      "attackPower": 13,
       "stage_id": 103,
       "score": 100,
       "speed": 1.33,
