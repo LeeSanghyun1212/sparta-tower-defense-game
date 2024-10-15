@@ -311,8 +311,8 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isAttacked = monster.move();
-      if (isAttacked) {
+      const {isDestroyed, isAttacked} = monster.move(base);
+      if (!isDestroyed && isAttacked) {
         // 기지에 자폭한 몬스터 제거
         sendEvent(userId, 32, {
           stageId: stageId,
@@ -322,18 +322,15 @@ function gameLoop() {
         });
         monsters.splice(i, 1);
       }
-      const isDestroyed = base.destroyed();
       if (isDestroyed) {
         sendEvent(userId, 12, {
           score: score,
           highscore: highScore,
         });
         /* 게임 오버 */
-        monsters.splice(0);
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        //location.reload();
+        location.reload();
       }
-
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
@@ -341,10 +338,12 @@ function gameLoop() {
         stageId: stageId,
         monsterId: monster.id,
         monsterLevel: monster.level,
+        monsterGold: monster.gold,
         monsterScore: monster.score,
       });
       monsters.splice(i, 1);
-
+      userGold += monster.gold;
+      score += monster.score;
       if (score > highScore) {
         highScore = score;
       }

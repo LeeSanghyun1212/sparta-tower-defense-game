@@ -10,7 +10,7 @@ import { getUser } from '../models/user.model.js';
 
 export const catchMonster = (userId, payload) => {
   // 클라이언트가 잡은 몬스터의 정보
-  const { stageId, monsterId, monsterLevel, monsterScore } = payload;
+  const { stageId, monsterId, monsterLevel, monsterGold, monsterScore } = payload;
   const { stages, monsters } = getServerGameAssets();
 
   const currentStage = getCurrentStage(userId);
@@ -36,6 +36,11 @@ export const catchMonster = (userId, payload) => {
     return { status: 'fail', message: '스테이지 레벨과 몬스터의 레벨 차이가 예상 범위 밖입니다.' };
   }
 
+  // 몬스터별 골드 유효성 검사
+  if (Math.abs(monsterData.gold + monsterLevel*5 - monsterGold) > 5) {
+    return { status: 'fail', message: '몬스터 골드가 비정상적인 값입니다.' };
+  }
+
   // 몬스터별 점수 유효성 검사
   if (Math.abs(monsterData.score + monsterLevel * 10 - monsterScore) > 5) {
     return { status: 'fail', message: '몬스터 점수가 비정상적인 값입니다.' };
@@ -45,7 +50,7 @@ export const catchMonster = (userId, payload) => {
   user.score += monsterScore;
 
   const serverTime = Date.now();
-  setCatchMonster(userId, stageId, monsterId, monsterLevel, monsterScore, serverTime); // 유저의 현재 스테이지레벨, 몬스터번호, 몬스터레벨, 점수, 잡은 시간을 기록
+  setCatchMonster(userId, stageId, monsterId, monsterLevel, monsterGold, monsterScore, serverTime); // 유저의 현재 스테이지레벨, 몬스터번호, 몬스터레벨, 점수, 잡은 시간을 기록
 
   return { status: 'success', handlerId: 31, score: user.score };
 };
@@ -97,6 +102,5 @@ export const attackedBase = (userId, payload) => {
     user.baseHp,
     serverTime,
   ); // 유저의 현재 스테이지레벨, 받은 데미지, 남은 건물 체력, 시간을 기록
-  console.log(getAttackedBase(userId));
   return { status: 'success', handlerId: 32, baseHp: user.baseHp };
 };
