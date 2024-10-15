@@ -331,7 +331,7 @@ function gameLoop() {
         /* 게임 오버 */
         monsters.splice(0);
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        //location.reload();
+        location.reload();
       }
 
       monster.draw(ctx);
@@ -391,7 +391,7 @@ export function initGame() {
   if (isInitGame) {
     return;
   }
-  
+
   //monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   monsterPath = generateCustomMonsterPath();
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
@@ -441,7 +441,6 @@ Promise.all([
         sendEvent(userId, 41);
         sendGameStartEvent(userId, 11, startTimestamp);
         isConnectionHandled = true;
-        
       }
     });
     serverSocket.on('response', (data) => {
@@ -459,15 +458,15 @@ Promise.all([
             }
             break;
           case 31:
-          {
-            score = data.score;
-          }
-          break;
-        case 32:
-          {
-            base.hp = data.baseHp;
-          }
-          break; 
+            {
+              score = data.score;
+            }
+            break;
+          case 32:
+            {
+              base.hp = data.baseHp;
+            }
+            break;
           case 41:
             {
               console.log('Payload:', data.highScore);

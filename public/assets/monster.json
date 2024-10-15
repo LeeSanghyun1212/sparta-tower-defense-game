@@ -8,7 +8,7 @@
       "attackPower": 10,
       "stage_id": 100,
       "score": 100,
-      "speed": 100,
+      "speed": 5,
       "width": 53,
       "height": 80,
       "imageIndex": 0
