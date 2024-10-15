@@ -457,11 +457,6 @@ Promise.all([
               }
             }
             break;
-            case 41:
-            {
-              highScore = data.highScore;
-            }
-            break;
           case 31:
             {
               score = data.score;
@@ -470,6 +465,11 @@ Promise.all([
           case 32:
             {
               base.hp = data.baseHp;
+            }
+            break;
+            case 41:
+            {
+              highScore = data.highScore;
             }
             break;
           default: {
