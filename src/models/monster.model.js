@@ -10,8 +10,8 @@ export const getCatchMonster = (uuid) => {
 };
 
 // 몬스터 킬 점수를 획득한 데이터를 기록
-export const setCatchMonster = (uuid, stageLevel, monsterId, monsterLevel, monsterScore, timestamp) => {
-  return catchMonsters[uuid].push({ stageLevel, monsterId, monsterLevel, monsterScore, timestamp });
+export const setCatchMonster = (uuid, stageLevel, monsterId, monsterLevel, monsterGold, monsterScore, timestamp) => {
+  return catchMonsters[uuid].push({ stageLevel, monsterId, monsterLevel, monsterGold, monsterScore, timestamp });
 };
 
 export const clearCatchMonster = (uuid) => {

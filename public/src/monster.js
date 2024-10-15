@@ -35,11 +35,11 @@ export class Monster {
     this.height = monsterData.height;
     this.image = monsterImages[monsterData.imageIndex];
     this.score = monsterData.score + level * 10;
+    this.gold = monsterData.gold + level * 5;
   }
 
-  move() {
+  move(base) {
     const effectiveSpeed = this.isSlowed ? this.originalSpeed * (1 - this.slowAmount) : this.speed;
-
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -67,7 +67,7 @@ export class Monster {
       }
     }
   }
-
+  
   applySlow(amount, duration) {
     if (!this.isSlowed) {
       this.isSlowed = true;
@@ -76,6 +76,9 @@ export class Monster {
     } else {
       // 슬로우가 이미 적용된 상태라면, 남은 지속 시간을 연장할 수 있습니다.
       this.slowDuration = Math.max(this.slowDuration, duration);
+      const isDestroyed = base.takeDamage(this.attackPower);
+      const isAttacked = true;
+      return {isDestroyed, isAttacked};
     }
   }
 

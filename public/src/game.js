@@ -358,8 +358,8 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      const isAttacked = monster.move();
-      if (isAttacked) {
+      const {isDestroyed, isAttacked} = monster.move(base);
+      if (!isDestroyed && isAttacked) {
         // 기지에 자폭한 몬스터 제거
         sendEvent(userId, 32, {
           stageId: stageId,
@@ -369,18 +369,15 @@ function gameLoop() {
         });
         monsters.splice(i, 1);
       }
-      const isDestroyed = base.destroyed();
       if (isDestroyed) {
         sendEvent(userId, 12, {
           score: score,
           highscore: highScore,
         });
         /* 게임 오버 */
-        monsters.splice(0);
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        location.reload();
+        location.reload(2000);
       }
-
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
@@ -388,20 +385,17 @@ function gameLoop() {
         stageId: stageId,
         monsterId: monster.id,
         monsterLevel: monster.level,
+        monsterGold: monster.gold,
         monsterScore: monster.score,
       });
       monsters.splice(i, 1);
       score += monster.score;
+      userGold += monster.gold;
       if (score >= highScore) {
-        highScore = score;
-      }
-
-      if (score > highScore) {
         highScore = score;
       }
     }
   }
-
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
@@ -518,9 +512,8 @@ Promise.all([
               base.hp = data.baseHp;
             }
             break;
-          case 41:
+            case 41:
             {
-              console.log('Payload:', data.highScore);
               highScore = data.highScore;
             }
             break;
