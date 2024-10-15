@@ -1,7 +1,7 @@
 import { CLIENT_VERSION } from '../constant.js';
 import { createStage } from '../models/stage.model.js';
 import { addUser, getUsers, removeUser } from '../models/user.model.js';
-import handlerMappings from './handlermapping.js';
+import handlerMappings from './handlerMapping.js'
 
 export const handleDisconnect = (socket, userId) => {
   console.log(`info : ${socket}`);

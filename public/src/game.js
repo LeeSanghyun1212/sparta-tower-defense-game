@@ -31,7 +31,7 @@ let goalTimestamp = 0; // 스테이지 목표 시간
 let numOfInitialTowers = 0; // 초기 타워 개수
 
 let stageId = 0;
-let stageChange = false;
+let stageChange = true;
 let monsterId = 0; // 몬스터 ID
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
@@ -273,7 +273,8 @@ function gameLoop() {
   const deltaTime = (timestamp - startTimestamp) / 1000;
   const currentStageIndex = stageDataTable.data.findIndex((stage) => stage.id === stageId);
   const targetStageId = stageDataTable.data[currentStageIndex + 1].id;
-  if (deltaTime > goalTimestamp) {
+  if (deltaTime > goalTimestamp && stageChange) {
+    stageChange = false;
     sendEvent(userId, 13, {
       stageId,
       targetStageId,
