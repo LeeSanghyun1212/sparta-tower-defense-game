@@ -5,8 +5,6 @@ export class Tower {
   static towerData = [];
 
   static loadTowerData(data) {
-    console.log('Loaded tower data:', Tower.towerData);
-
     this.towerData = data;
   }
 
@@ -81,22 +79,24 @@ export class Tower {
     }
   }
 
-  upgrade() {
-    if (!this.towerLevel) {
-      this.towerLevel = 1;
-    }
-    if (this.towerLevel < 3) {
-      this.towerLevel++;
-      if (this.towerLevel === 2) {
-        this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
-        this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
-      } else if (this.towerLevel === 3) {
-        this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
-        this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
-      }
-      this.upgradeCost += 20; // 업그레이드 비용 증가
-    }
-  }
+  // upgrade() {
+  //   if (!this.towerLevel) {
+  //     this.towerLevel = 1;
+  //   }
+  //   if (this.towerLevel < 3) {
+  //     this.towerLevel++;
+  //     if (this.towerLevel === 2) {
+  //       this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
+  //       this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
+  //     } else if (this.towerLevel === 3) {
+  //       this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
+  //       this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
+  //     }
+  //     this.upgradeCost += 20; // 업그레이드 비용 증가
+  //   } else {
+  //     console.log('최대 레벨에 도달했습니다.'); // 최대 레벨 도달 메시지
+  //   }
+  // }
 }
 
 //사거리 짧은 단일 공격 타워

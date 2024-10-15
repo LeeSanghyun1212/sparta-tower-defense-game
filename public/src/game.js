@@ -252,7 +252,6 @@ canvas.addEventListener('dragover', (event) => {
 canvas.addEventListener('drop', (event) => {
   event.preventDefault();
   const towerType = event.dataTransfer.getData('text/plain');
-  console.log('Dropped tower type:', towerType);
   const { offsetX, offsetY } = event;
 
   // 타워 배치 위치 유효성 검사
@@ -529,6 +528,31 @@ Promise.all([
               towers.splice(towerIndex, 1);
             }
             break;
+          case 24: // 타워 업그레이드 응답
+            {
+              userGold = data.userGold;
+
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              const towerIndex = towers.findIndex((tower) => {
+                return tower.x === x && tower.y === y && tower.type === towerData.type;
+              });
+
+              if (towerIndex !== -1) {
+                towers[towerIndex].level += 1;
+
+                const upgradedTower = towers[towerIndex];
+                upgradedTower.attackPower = towerData.attackPower;
+                upgradedTower.range = towerData.range;
+
+                upgradedTower.draw(ctx, towerImages);
+              } else {
+                console.log('업그레이드된 타워를 찾을 수 없습니다.');
+              }
+            }
+            break;
           case 31:
             {
               score = data.score;
@@ -589,7 +613,12 @@ function clickEvent(event) {
   }
 
   if (isUpgradeTower) {
-    // 이따 구현 예정
+    const selectTower = findNearTower(dx, dy);
+    if (!selectTower) return;
+
+    const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
+    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    sendEvent(userId, 24, payload);
   }
 }
 
