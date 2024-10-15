@@ -175,24 +175,41 @@ export class knightTower extends Tower {
 
 // 슬로우 타워
 export class bishopTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.slowAmount = 0.5; // 몬스터 속도를 50% 감소시킴
-    this.slowDuration = 120; // 속도 감소 지속 시간
+    this.slowDuration = 120; // 속도 감소 지속 시간 (2초, 초당 60프레임)
+    this.upgradeCost = 50;
+    this.target = null;
   }
-
   attack(monster) {
     if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower; // 몬스터 공격
-      console.log(`타워 ${this.type}가 몬스터 ${monster.id}에 공격: ${this.attackPower} 데미지`);
-
-      // 슬로우 효과 적용
+      monster.hp -= this.attackPower;
       if (!monster.isSlowed) {
-        monster.applySlow(this.slowAmount, this.slowDuration); // 슬로우 적용
-        console.log(`몬스터 ${monster.id}가 슬로우되었습니다. 새로운 속도: ${monster.speed}`);
+        monster.applySlow(this.slowAmount, this.slowDuration);
       }
-
-      this.cooldown = 60; // 공격 쿨타임 설정
+      this.cooldown = this.defaultCooldown;
+      this.target = monster;
+      this.beamDuration = this.defaultBeamDuration;
+    }
+  }
+  draw(ctx, towerImages) {
+    ctx.drawImage(
+      towerImages[`${this.type}`],
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height,
+    );
+    if (this.beamDuration > 0 && this.targets) {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y); // 타워 위치에서 시작
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2); // 몬스터 위치로 광선
+      ctx.strokeStyle = 'green';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.closePath();
+      this.beamDuration--;
     }
   }
 }
