@@ -1,4 +1,5 @@
 import { towerDataTable } from './init/asset.js';
+import { monsterDataTable } from './init/asset.js';
 
 export class Tower {
   static towerData = [];
@@ -23,6 +24,7 @@ export class Tower {
     this.y = y; // 타워 이미지 y 좌표
     this.type = towerType;
     this.target = null; // 타워 광선의 목표
+    this.upgradeCost = 50;
     this.init();
   }
 
@@ -99,55 +101,82 @@ export class Tower {
 
 //사거리 짧은 단일 공격 타워
 export class pawnTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'pawnTower');
+  constructor(x, y, towerTower) {
+    super(x, y, towerTower);
     this.upgradeCost = 50; //업그레이드 비용
   }
 }
 
 //사거리 긴 단일 공격 타워
 export class rookTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'rookTower');
+  constructor(x, y, towerType) {
+    super(x, y, towerTower);
     this.upgradeCost = 50; // 업그레이드 비용
   }
 }
 
 //여러마리 때릴 수 있는 타워(최대 3마리)
 export class knightTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'knightTower');
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 50; // 업그레이드 비용
-    this.attackInterval = 300; // 5초에 한번 공격
-    this.lastAttackTime = 0; // 마지막 공격 시간
+    this.targets = [];
   }
 
   attack(monsters) {
-    if (this.lastAttackTime <= 0) {
+    if (this.cooldown <= 0) {
       let attackedCount = 0;
 
-      for (const monster of monsters) {
+      for (let i = 0; i < monsters.length; i++) {
+        const monster = monsters[i];
         if (attackedCount < 3) {
           const distance = Math.sqrt(
             Math.pow(this.x - monster.x, 2) + Math.pow(this.y - monster.y, 2),
           );
           if (distance < this.range) {
             monster.hp -= this.attackPower; // 공격
+            this.targets.push(monster); // 광선의 목표 설정
+
             attackedCount++;
           }
+        } else {
+          break;
         }
       }
-      this.lastAttackTime = this.attackInterval; // 공격 쿨타임 설정
+      this.cooldown = this.defaultCooldown; // 3초 쿨타임 (초당 60프레임)
+      this.beamDuration = this.defaultBeamDuration; // 광선 지속 시간 (0.5초)
+    }
+  }
+
+  draw(ctx, towerImages) {
+    ctx.drawImage(
+      towerImages[`${this.type}`],
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height,
+    );
+    if (this.beamDuration > 0 && this.targets.length > 0) {
+      this.targets.forEach((target) => {
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(target.x + target.width / 2, target.y + target.height / 2);
+        ctx.strokeStyle = 'yellow';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+        ctx.closePath();
+      });
+      this.beamDuration--;
     } else {
-      this.lastAttackTime--; // 쿨타임 감소
+      this.targets = [];
     }
   }
 }
 
 // 슬로우 타워
 export class bishopTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'bishopTower');
+  constructor(x, y, towerTower) {
+    super(x, y, towerTower);
     this.slowAmount = 0.5; // 몬스터 속도를 50% 감소시킴
     this.slowDuration = 120; // 속도 감소 지속 시간
   }
@@ -155,8 +184,14 @@ export class bishopTower extends Tower {
   attack(monster) {
     if (this.cooldown <= 0) {
       monster.hp -= this.attackPower; // 몬스터 공격
-      monster.speed *= this.slowAmount; // 몬스터 속도 감소
-      monster.slowDuration = this.slowDuration; // 속도 감소 지속 시간 설정
+      console.log(`타워 ${this.type}가 몬스터 ${monster.id}에 공격: ${this.attackPower} 데미지`);
+
+      // 슬로우 효과 적용
+      if (!monster.isSlowed) {
+        monster.applySlow(this.slowAmount, this.slowDuration); // 슬로우 적용
+        console.log(`몬스터 ${monster.id}가 슬로우되었습니다. 새로운 속도: ${monster.speed}`);
+      }
+
       this.cooldown = 60; // 공격 쿨타임 설정
     }
   }
@@ -164,8 +199,8 @@ export class bishopTower extends Tower {
 
 //가까이오면 죽을때까지 때리는 타워
 export class queenTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'queenTower');
+  constructor(x, y, towerTower) {
+    super(x, y, towerTower);
     this.upgradeCost = 150; // 업그레이드 비용
   }
 
@@ -178,8 +213,8 @@ export class queenTower extends Tower {
 }
 
 export class kingTower extends Tower {
-  constructor(x, y) {
-    super(x, y, 'kingTower');
+  constructor(x, y, towerTower) {
+    super(x, y, towerTower);
     this.upgradeCost = 150; // 업그레이드 비용
   }
 

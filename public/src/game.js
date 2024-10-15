@@ -3,7 +3,15 @@ import { CLIENT_VERSION } from './constant.js';
 import { stageDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
 import { sendEvent, sendGameStartEvent } from './socket.js';
-import { Tower } from './tower.js';
+import {
+  bishopTower,
+  kingTower,
+  knightTower,
+  pawnTower,
+  queenTower,
+  rookTower,
+  Tower,
+} from './tower.js';
 
 let userId;
 let isConnectionHandled = false;
@@ -226,8 +234,43 @@ function placeNewTower(towerType, x, y) {
   }
 
   userGold -= towerData.cost;
+  let tower = null;
+  switch (towerData.type) {
+    case 'pawnTower':
+      {
+        tower = new pawnTower(x, y, towerData.type);
+      }
+      break;
+    case 'rookTower':
+      {
+        tower = new rookTower(x, y, towerData.type);
+      }
+      break;
+    case 'knightTower':
+      {
+        tower = new knightTower(x, y, towerData.type);
+      }
+      break;
+    case 'bishopTower':
+      {
+        tower = new bishopTower(x, y, towerData.type);
+      }
+      break;
+    case 'queenTower':
+      {
+        tower = new queenTower(x, y, towerData.type);
+      }
+      break;
+    case 'kingTower':
+      {
+        tower = new kingTower(x, y, towerData.type);
+      }
+      break;
+    default: {
+      console.log('Unknown Tower Type : ', towerData.type);
+    }
+  }
 
-  const tower = new Tower(x, y, towerData.type); // 타워 생성
   towers.push(tower);
   tower.draw(ctx, towerImages);
 }
@@ -294,14 +337,18 @@ function gameLoop() {
   towers.forEach((tower) => {
     tower.draw(ctx, towerImages);
     tower.updateCooldown();
-    monsters.forEach((monster) => {
-      const distance = Math.sqrt(
-        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
-      );
-      if (distance < tower.range) {
-        tower.attack(monster);
-      }
-    });
+    if (tower.type === 'knightTower') {
+      tower.attack(monsters);
+    } else {
+      monsters.forEach((monster) => {
+        const distance = Math.sqrt(
+          Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+        );
+        if (distance < tower.range) {
+          tower.attack(monster);
+        }
+      });
+    }
   });
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
