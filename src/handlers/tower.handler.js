@@ -1,70 +1,81 @@
-import { pawnTower, rookTower, knightTower, bishopTower, queenTower, kingTower } from './tower.js';
+import { getServerGameAssets } from '../init/asset.js';
+import { getUser } from '../models/user.model.js';
 
-export class TowerManager {
-  constructor() {
-    this.towers = [];
+export const placeAddTower = (userId, payload) => {
+  const { userGold, towerId, x, y } = payload;
+
+  const user = getUser(userId);
+
+  const { towers } = getServerGameAssets();
+
+  const towerData = towers.data.find((tower) => tower.id === towerId);
+  if (!towerData) {
+    return { status: 'fail', message: '타워 데이터가 존재하지 않습니다.' };
   }
 
-  addTower(towerType, x, y) {
-    let tower;
-    switch (towerType) {
-      case 'pawn':
-        tower = new pawnTower(x, y);
-        break;
-      case 'rook':
-        tower = new rookTower(x, y);
-        break;
-      case 'knight':
-        tower = new knightTower(x, y);
-        break;
-      case 'bishop':
-        tower = new bishopTower(x, y);
-        break;
-      case 'queen':
-        tower = new queenTower(x, y);
-        break;
-      case 'king':
-        tower = new kingTower(x, y);
-        break;
-      default:
-        console.error(`Unknown tower type: ${towerType}`);
-        return;
-    }
-    this.towers.push(tower);
+  user.towers.push({ towerId, x, y });
+  user.userGold -= towerData.cost;
+
+  if (userGold - towerData.cost !== user.userGold) {
+    return { status: 'fail', message: '골드가 일치하지 않습니다.' };
   }
 
-  updateTowers(monsters) {
-    for (const tower of this.towers) {
-      tower.updateCooldown();
-      if (tower.target) {
-        if (tower.beamDuration > 0) {
-          tower.attack(tower.target);
-        } else {
-          tower.target = null; // 타겟이 죽거나 범위를 벗어나면 타겟 초기화
-        }
-      } else {
-        // 타겟 찾기
-        for (const monster of monsters) {
-          const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
-          if (distance <= tower.range) {
-            tower.target = monster;
-            break;
-          }
-        }
-      }
-    }
+  return { status: 'success', handlerId: 22, userGold: user.userGold, towerId, x, y };
+};
+
+export const sellTower = (userId, payload) => {
+  const { towerId, x, y } = payload;
+
+  const user = getUser(userId);
+
+  const { towers } = getServerGameAssets();
+
+  const towerData = towers.data.find((tower) => tower.id === towerId);
+  if (!towerData) {
+    return { status: 'fail', message: '타워 데이터가 존재하지 않습니다.' };
   }
 
-  drawTowers(ctx, towerImages) {
-    for (const tower of this.towers) {
-      const towerImage = towerImages[tower.id]; // towerImages는 타워 이미지 객체입니다.
-      tower.draw(ctx, towerImage);
-    }
+  user.userGold += Math.floor(towerData.cost / 2);
+  const towerIndex = user.towers.findIndex(
+    (tower) => tower.x === x && tower.y === y && tower.towerId === towerId,
+  );
+  if (towerIndex === -1) {
+    return { status: 'fail', message: '유저는 해당 타워를 가지고 있지 않습니다.' };
+  }
+  user.towers.splice(towerIndex, 1);
+
+  return { status: 'success', handlerId: 23, userGold: user.userGold, towerId, x, y };
+};
+
+export const upgradeTower = (userId, payload) => {
+  const { towerId, x, y } = payload;
+  const user = getUser(userId);
+  const { towers } = getServerGameAssets();
+
+  const towerData = towers.data.find((tower) => tower.id === towerId);
+  if (!towerData) {
+    return { status: 'fail', message: '타워 데이터가 존재하지 않습니다.' };
   }
 
-  upgradeTower(towerIndex) {
-    if (this.towers[towerIndex]) {
-      this.towers[towerIndex].upgrade();
-    }
+  const upgradeCost = Math.floor(towerData.cost * 1.2);
+  if (user.userGold < upgradeCost) {
+    return { status: 'fail', message: '골드가 부족합니다.' };
   }
-}
+
+  user.userGold -= upgradeCost;
+
+  const towerIndex = user.towers.findIndex(
+    (tower) => tower.x === x && tower.y === y && tower.towerId === towerId,
+  );
+
+  if (towerIndex === -1) {
+    return { status: 'fail', message: '유저는 해당 타워를 가지고 있지 않습니다.' };
+  }
+
+  if (user.towers[towerIndex].level < 3) {
+    user.towers[towerIndex].level += 1;
+    return { status: 'success', handlerId: 24, userGold: user.userGold, towerId, x, y };
+  } else {
+    return { status: 'fail', message: '타워는 이미 최대 레벨입니다.' };
+  }
+};
