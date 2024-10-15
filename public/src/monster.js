@@ -15,8 +15,18 @@ export class Monster {
     this.y = path[0].y; // 몬스터의 y 좌표 (최초 위치는 경로의 첫 번째 지점)
     this.level = stageDataTable.data.findIndex((stage) => stage.id === stageId) + 1;
     this.init(monsterImages, this.level);
+    this.isSlowed = false;
+    this.slowDuration = 0;
   }
-
+  update() {
+    if (this.isSlowed) {
+      this.slowDuration--;
+      if (this.slowDuration <= 0) {
+        this.isSlowed = false;
+        this.speed = monsterData.speed; // 원래 속도로 복구
+      }
+    }
+  }
   init(monsterImages, level) {
     const monsterData = monsterDataTable.data.find((monster) => monster.id === this.id);
     if (!monsterData) {
@@ -49,7 +59,7 @@ export class Monster {
         this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
       }
       return false;
-    } else {    
+    } else {
       let isAttacked = true;
       return isAttacked;
     }
