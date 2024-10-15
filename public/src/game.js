@@ -41,6 +41,8 @@ const towers = [];
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let isSellTower = false; //타워판매
+let isUpgradeTower = false; //타워업글
 
 // 타워 이미지 배열 추가
 const towerImages = {
@@ -510,6 +512,23 @@ Promise.all([
               tower.draw(ctx, towerImages);
             }
             break;
+          case 23: // 타워 판매 응답
+            {
+              // 유저 골드 서버로부터 동기화
+              userGold = data.userGold;
+
+              // 해당 towerId를 가진 타워의 타입을 가져오자.
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              const towerIndex = towers.findIndex((tower) => {
+                return tower.x === x && tower.y === y && tower.type === towerData.type;
+              });
+
+              towers.splice(towerIndex, 1);
+            }
+            break;
           case 31:
             {
               score = data.score;
@@ -535,4 +554,55 @@ Promise.all([
       }
     });
   }
+});
+// 마우스 클릭 위치에서 가장 가까운 타워를 얻어오는 함수
+// 단, maxDistance의 밖의 타워는 찾지 않는다.
+function findNearTower(x, y) {
+  let selectTower = null;
+  const maxDistance = 50;
+  let minDistance = 100;
+
+  towers.forEach((tower) => {
+    const distance = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
+    if (distance < maxDistance) {
+      if (distance < minDistance) {
+        minDistance = distance;
+        selectTower = tower;
+      }
+    }
+  });
+
+  return selectTower;
+}
+
+function clickEvent(event) {
+  const dx = event.clientX - ctx.canvas.offsetLeft;
+  const dy = event.clientY - ctx.canvas.offsetTop;
+
+  if (isSellTower) {
+    const selectTower = findNearTower(dx, dy);
+    if (!selectTower) return;
+
+    const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
+    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    sendEvent(userId, 23, payload);
+  }
+
+  if (isUpgradeTower) {
+    // 이따 구현 예정
+  }
+}
+
+canvas.addEventListener('click', clickEvent);
+
+const sellButton = document.getElementById('sellTowerButton');
+
+sellButton.addEventListener('click', () => {
+  isSellTower = true;
+});
+
+const upgradeButton = document.getElementById('upgradeTowerButton');
+
+upgradeButton.addEventListener('click', () => {
+  isUpgradeTower = true;
 });
