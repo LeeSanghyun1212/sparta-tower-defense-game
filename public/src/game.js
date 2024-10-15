@@ -337,7 +337,7 @@ function gameLoop() {
   towers.forEach((tower) => {
     tower.draw(ctx, towerImages);
     tower.updateCooldown();
-    if (tower.type === 'knightTower') {
+    if (tower.type === 'knightTower' || tower.type === 'bishop') {
       tower.attack(monsters);
     } else {
       monsters.forEach((monster) => {
