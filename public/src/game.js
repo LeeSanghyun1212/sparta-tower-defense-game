@@ -280,7 +280,7 @@ function gameLoop() {
       targetStageId,
       timestamp,
       score,
-      hp : base.hp,
+      hp: base.hp,
     });
   }
 
@@ -471,11 +471,10 @@ Promise.all([
               }
             }
             break;
-          case 13: 
-            {
-              initStageData(data.stageId);
-              break;
-            }
+          case 13: {
+            initStageData(data.stageId);
+            break;
+          }
           case 22:
             {
               userGold = data.userGold;
@@ -533,9 +532,15 @@ Promise.all([
               const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
               const x = data.x;
               const y = data.y;
+              const towerLevel = data.towerLevel;
 
               const towerIndex = towers.findIndex((tower) => {
-                return tower.x === x && tower.y === y && tower.type === towerData.type;
+                return (
+                  tower.x === x &&
+                  tower.y === y &&
+                  tower.type === towerData.type &&
+                  tower.level === towerLevel
+                );
               });
 
               towers.splice(towerIndex, 1);
@@ -548,19 +553,19 @@ Promise.all([
               const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
               const x = data.x;
               const y = data.y;
+              const towerLevel = data.towerLevel;
 
               const towerIndex = towers.findIndex((tower) => {
-                return tower.x === x && tower.y === y && tower.type === towerData.type;
+                return (
+                  tower.x === x &&
+                  tower.y === y &&
+                  tower.type === towerData.type &&
+                  tower.level === towerLevel - 1
+                );
               });
 
               if (towerIndex !== -1) {
-                towers[towerIndex].level += 1;
-
-                const upgradedTower = towers[towerIndex];
-                upgradedTower.attackPower = towerData.attackPower;
-                upgradedTower.range = towerData.range;
-
-                upgradedTower.draw(ctx, towerImages);
+                towers[towerIndex].upgrade(towerLevel);
               } else {
                 console.log('업그레이드된 타워를 찾을 수 없습니다.');
               }
@@ -621,8 +626,14 @@ function clickEvent(event) {
     if (!selectTower) return;
 
     const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
-    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    const payload = {
+      towerId: towerData.id,
+      x: selectTower.x,
+      y: selectTower.y,
+      towerLevel: selectTower.level,
+    };
     sendEvent(userId, 23, payload);
+    isSellTower = false;
   }
 
   if (isUpgradeTower) {
@@ -630,8 +641,14 @@ function clickEvent(event) {
     if (!selectTower) return;
 
     const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
-    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    const payload = {
+      towerId: towerData.id,
+      x: selectTower.x,
+      y: selectTower.y,
+      towerLevel: selectTower.level,
+    };
     sendEvent(userId, 24, payload);
+    isUpgradeTower = false;
   }
 }
 

@@ -22,8 +22,15 @@ export class Tower {
     this.y = y; // 타워 이미지 y 좌표
     this.type = towerType;
     this.target = null; // 타워 광선의 목표
+    this.level = 1;
     this.upgradeCost = 50;
     this.init();
+  }
+  upgrade(level) {
+    const towerData = towerDataTable.data.find((tower) => tower.type === this.type);
+    this.level = level;
+    this.attackPower = towerData.attack_power + 10 * (this.level - 1); //타워 공격력
+    this.range = towerData.range + 10 * (this.level - 1); // 타워 사거리
   }
 
   init() {
@@ -36,8 +43,8 @@ export class Tower {
     this.height = towerData.height; // 타워 이미지 세로 길이
 
     this.cost = towerData.cost; // 타워 구입 비용
-    this.attackPower = towerData.attack_power; //타워 공격력
-    this.range = towerData.range; // 타워 사거리
+    this.attackPower = towerData.attack_power + 10 * (this.level - 1); //타워 공격력
+    this.range = towerData.range + 10 * (this.level - 1); // 타워 사거리
     this.defaultCooldown = towerData.cooldown;
     this.cooldown = towerData.cooldown; // 타워 공격 쿨타임
     this.defaultBeamDuration = towerData.beamDuration; // 타워 광선 디폴트 지속 시간
@@ -78,25 +85,6 @@ export class Tower {
       this.cooldown--;
     }
   }
-
-  // upgrade() {
-  //   if (!this.towerLevel) {
-  //     this.towerLevel = 1;
-  //   }
-  //   if (this.towerLevel < 3) {
-  //     this.towerLevel++;
-  //     if (this.towerLevel === 2) {
-  //       this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
-  //       this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
-  //     } else if (this.towerLevel === 3) {
-  //       this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
-  //       this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
-  //     }
-  //     this.upgradeCost += 20; // 업그레이드 비용 증가
-  //   } else {
-  //     console.log('최대 레벨에 도달했습니다.'); // 최대 레벨 도달 메시지
-  //   }
-  // }
 }
 
 //사거리 짧은 단일 공격 타워
@@ -222,6 +210,12 @@ export class queenTower extends Tower {
     this.startAttackPower = this.attackPower; // 첫 공격 시작 시의 공격력
     this.frameCounting = 0;
     console.log(this.frameCounting);
+  }
+  upgrade(level) {
+    const towerData = towerDataTable.data.find((tower) => tower.type === this.type);
+    this.level = level;
+    this.attackPower = towerData.attack_power + 2 * (this.level - 1); //타워 공격력
+    this.range = towerData.range + 10 * (this.level - 1); // 타워 사거리
   }
 
   attack(monster) {
