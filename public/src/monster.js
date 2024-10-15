@@ -31,8 +31,9 @@ export class Monster {
     this.height = monsterData.height; // 몬스터 이미지 세로 길이
     this.image = monsterImages[monsterData.imageIndex]; // 몬스터 이미지
     this.score = monsterData.score + level * 10;
+    this.gold = monsterData.gold + level * 5;
   }
-  move() {
+  move(base) {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -49,9 +50,10 @@ export class Monster {
         this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
       }
       return false;
-    } else {    
-      let isAttacked = true;
-      return isAttacked;
+    } else {
+      const isDestroyed = base.takeDamage(this.attackPower);
+      const isAttacked = true;
+      return {isDestroyed, isAttacked};
     }
   }
 
