@@ -1,0 +1,46 @@
+{
+  "name": "tower_unlock",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 11,
+      "stage_id": 101,
+      "tower_id": 1
+    },
+    {
+      "id": 12,
+      "stage_id": 102,
+      "tower_id": 2
+    },
+    {
+      "id": 13,
+      "stage_id": 103,
+      "tower_id": 3
+    },
+    {
+      "id": 14,
+      "stage_id": 104,
+      "tower_id": 4
+    },
+    {
+      "id": 15,
+      "stage_id": 201,
+      "tower_id": 5
+    },
+    {
+      "id": 16,
+      "stage_id": 202,
+      "tower_id": 6
+    },
+    {
+      "id": 17,
+      "stage_id": 203,
+      "tower_id": 6
+    },
+    {
+      "id": 18,
+      "stage_id": 204,
+      "tower_id": 6
+    }
+  ]
+}

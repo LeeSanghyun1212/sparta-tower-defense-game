@@ -38,20 +38,32 @@
     <div class="form-container">
       <h1>내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
       <h2>로그인</h2>
-      <input type="text" id="username" placeholder="아이디" />
+      <input type="text" id="loginId" placeholder="아이디" />
       <input type="password" id="password" placeholder="비밀번호" />
       <button id="login">로그인</button>
       <button id="back">뒤로가기</button>
     </div>
     <script>
-      document.getElementById('login').addEventListener('click', () => {
-        const username = document.getElementById('username').value;
+      document.getElementById('login').addEventListener('click', async () => {
+        const loginId = document.getElementById('loginId').value;
         const password = document.getElementById('password').value;
-
-        /* 
-          로그인 API 호출 후 로그인 성공 시 index.html로 이동시켜주세요!
-          이 때, 엑세스 토큰은 어딘가에 저장을 해놔야겠죠?! 
-        */
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ loginId, password }),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.errorMessage || '로그인 실패');
+          }
+          alert(data.message);
+          window.location.href = 'index.html';
+        } catch (error) {
+          alert(error.message);
+        }
       });
 
       document.getElementById('back').addEventListener('click', () => {

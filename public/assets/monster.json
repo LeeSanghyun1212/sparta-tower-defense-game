@@ -1,0 +1,102 @@
+{
+  "name": "monster",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1001,
+      "hp": 50,
+      "attackPower": 10,
+      "stage_id": 100,
+      "gold": 4,
+      "score": 100,
+      "speed": 1,
+      "width": 53,
+      "height": 80,
+      "imageIndex": 0
+    },
+    {
+      "id": 1002,
+      "hp": 60,
+      "attackPower": 11,
+      "stage_id": 101,
+      "gold": 5,
+      "score": 100,
+      "speed": 1,
+      "width": 120,
+      "height": 100,
+      "imageIndex": 1
+    },
+    {
+      "id": 1003,
+      "hp": 71,
+      "attackPower": 12,
+      "stage_id": 102,
+      "gold": 6,
+      "score": 100,
+      "speed": 1,
+      "width": 53,
+      "height": 80,
+      "imageIndex": 2
+    },
+    {
+      "id": 1004,
+      "hp": 83,
+      "attackPower": 13,
+      "stage_id": 103,
+      "gold": 7,
+      "score": 100,
+      "speed": 1,
+      "width": 53,
+      "height": 80,
+      "imageIndex": 3
+    },
+    {
+      "id": 2001,
+      "hp": 104,
+      "attackPower": 10,
+      "stage_id": 100,
+      "gold": 8,
+      "score": 100,
+      "speed": 1,
+      "width": 120,
+      "height": 100,
+      "imageIndex": 1
+    },
+    {
+      "id": 2002,
+      "hp": 126,
+      "attackPower": 11,
+      "stage_id": 101,
+      "gold": 9,
+      "score": 100,
+      "speed": 1,
+      "width": 190,
+      "height": 180,
+      "imageIndex": 1
+    },
+    {
+      "id": 2003,
+      "hp": 148,
+      "attackPower": 12,
+      "stage_id": 102,
+      "gold": 10,
+      "score": 100,
+      "speed": 1,
+      "width": 190,
+      "height": 180,
+      "imageIndex": 1
+    },
+    {
+      "id": 2004,
+      "hp": 170,
+      "attackPower": 13,
+      "stage_id": 103,
+      "gold": 11,
+      "score": 100,
+      "speed": 1,
+      "width": 190,
+      "height": 180,
+      "imageIndex": 1
+    }
+  ]
+}

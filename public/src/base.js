@@ -1,3 +1,5 @@
+import { sendEvent } from './socket.js';
+
 export class Base {
   constructor(x, y, maxHp) {
     // 생성자 안에서 기지의 속성을 정의한다고 생각하시면 됩니다!
@@ -12,25 +14,43 @@ export class Base {
   draw(ctx, baseImage) {
     ctx.drawImage(
       baseImage,
-      this.x - this.width,
+      this.x - this.width + 5,
       this.y - this.height / 2,
       this.width,
       this.height,
     );
 
-    ctx.font = '16px Arial';
-    ctx.fillStyle = 'white';
-    ctx.fillText(
-      `HP: ${this.hp}/${this.maxHp}`,
-      this.x - this.width,
-      this.y - this.height / 2 - 10,
+    this.drawHealthBar(ctx);
+  }
+
+  drawHealthBar(ctx) {
+    const barWidth = 150; // 채력바의 가로 길이
+    const barHeight = 30; // 채력바의 세로 길이
+    const healthRatio = this.hp / this.maxHp;
+
+    // 채력바 배경
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // 반투명 검정색
+    ctx.fillRect(
+      this.x - this.width / 2 - barWidth / 2 + 5,
+      this.y + this.height / 2,
+      barWidth,
+      barHeight,
+    );
+
+    // 채력바 현재 HP
+    ctx.fillStyle = 'red'; // 채력바 색상
+    ctx.fillRect(
+      this.x - this.width / 2 - barWidth / 2 + 5,
+      this.y + this.height / 2,
+      barWidth * healthRatio,
+      barHeight,
     );
   }
 
   takeDamage(amount) {
-    // 기지가 데미지를 입는 메소드입니다.
+    // 기지가 파괴되었는지를 구분하는 메소드입니다.
     // 몬스터가 기지의 HP를 감소시키고, HP가 0 이하가 되면 게임 오버 처리를 해요!
     this.hp -= amount;
-    return this.hp <= 0; // 기지의 HP가 0 이하이면 true, 아니면 false
+    return this.hp <= 0;
   }
 }

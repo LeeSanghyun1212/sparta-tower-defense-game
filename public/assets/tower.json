@@ -1,0 +1,78 @@
+{
+  "name": "tower",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1,
+      "type": "pawnTower",
+      "attack_power": 30,
+      "range": 175,
+      "cost": 100,
+      "cooldown": 180,
+      "beamDuration": 60,
+      "upgradeCost": 50,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": 2,
+      "type": "rookTower",
+      "attack_power": 30,
+      "range": 400,
+      "cost": 250,
+      "cooldown": 300,
+      "beamDuration": 60,
+      "upgradeCost": 50,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": 3,
+      "type": "knightTower",
+      "attack_power": 20,
+      "range": 300,
+      "cost": 200,
+      "cooldown": 200,
+      "beamDuration": 60,
+      "upgradeCost": 50,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": 4,
+      "type": "bishopTower",
+      "attack_power": 10,
+      "range": 300,
+      "cost": 300,
+      "cooldown": 400,
+      "beamDuration": 60,
+      "upgradeCost": 50,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": 5,
+      "type": "queenTower",
+      "attack_power": 1,
+      "range": 250,
+      "cost": 1000,
+      "cooldown": 60,
+      "beamDuration": 100,
+      "upgradeCost": 150,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": 6,
+      "type": "kingTower",
+      "attack_power": 500,
+      "range": 130,
+      "cost": 250,
+      "cooldown": 600,
+      "beamDuration": 60,
+      "upgradeCost": 150,
+      "width": 50,
+      "height": 100
+    }
+  ]
+}

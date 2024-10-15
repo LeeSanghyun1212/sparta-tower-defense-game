@@ -31,18 +31,104 @@
         font-size: 16px;
         cursor: pointer;
       }
+      .upgrade-container {
+        display: none; /* 업그레이드 버튼을 기본적으로 숨김 */
+        margin-top: 20px;
+      }
+      #tower-buttons {
+        display: none; /*타워 버튼을 기본적으로 숨김*/
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+      .tower-button {
+        width: 50px;
+        height: 100px;
+        cursor: pointer;
+        transition: filter 0.3s;
+      }
+      .tower-button:hover {
+        filter: brightness(1.2); /* 마우스 오버 시 밝기 증가 */
+      }
+      .tower-button.disabled {
+        filter: grayscale(100%); /* 골드 부족 시 회색으로 변환 */
+      }
     </style>
   </head>
   <body>
     <div class="button-container">
       <h1 style="color: white">내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
+      <h2 id="nickname" style="color: white"></h2>
       <button id="registerButton">회원가입</button>
       <button id="loginButton">로그인</button>
       <button id="playButton">게임 플레이</button>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+    <div class="upgrade-container">
+      <button id="upgradeTowerButton">타워 업그레이드</button>
+      <button id="sellTowerButton">타워 판매</button>
+    </div>
+    <div id="tower-buttons">
+      <img
+        id="pawnTowerButton"
+        class="tower-button"
+        src="images/tower_pawnTower.png"
+        alt="Pawn Tower"
+      />
+      <img
+        id="rookTowerButton"
+        class="tower-button"
+        src="images/tower_rookTower.png"
+        alt="Rook Tower"
+      />
+      <img
+        id="knightTowerButton"
+        class="tower-button"
+        src="images/tower_knightTower.png"
+        alt="Knight Tower"
+      />
+      <img
+        id="bishopTowerButton"
+        class="tower-button"
+        src="images/tower_bishopTower.png"
+        alt="Bishop Tower"
+      />
+      <img
+        id="queenTowerButton"
+        class="tower-button"
+        src="images/tower_queenTower.png"
+        alt="Queen Tower"
+      />
+      <img
+        id="kingTowerButton"
+        class="tower-button"
+        src="images/tower_kingTower.png"
+        alt="King Tower"
+      />
+    </div>
+
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
+      import { Tower } from './src/tower.js';
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+
+      // 페이지가 로드되면 닉네임 표시하기
+      document.addEventListener('DOMContentLoaded', () => {
+        const nickname = getCookie('nickname'); // 쿠키에서 닉네임 가져오기
+        if (nickname) {
+          document.getElementById('nickname').textContent = `안녕하세요, ${nickname}님!`; // 닉네임 표시
+        } else {
+          document.getElementById('nickname').textContent = `로그인이 필요합니다.`;
+        }
+      });
+      let selectedTower = null;
       document.getElementById('registerButton').addEventListener('click', () => {
         window.location.href = 'register.html';
       });
@@ -54,8 +140,35 @@
       document.getElementById('playButton').addEventListener('click', () => {
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
-        import('./src/game.js');
+        document.querySelector('.upgrade-container').style.display = 'block';
+        document.getElementById('tower-buttons').style.display = 'block';
+        fetch('./assets/tower.json')
+          .then((response) => response.json())
+          .then((data) => {
+            Tower.loadTowerData(data.data);
+            console.log('Loaded tower data:', Tower.towerData);
+            import('./src/game.js');
+          })
+          .catch((error) => console.error('Error loading tower data:', error));
       });
+
+      const createDraggableImage = (towerType) => {
+        const img = new Image();
+        img.src = `images/tower_${towerType}.png`; // 타워 이미지 경로 설정
+        img.draggable = true;
+
+        img.addEventListener('dragstart', (event) => {
+          event.dataTransfer.setData('text/plain', towerType); // 타워 타입 저장
+          img.style.opacity = 0.5;
+        });
+        img.addEventListener('dragend', () => {
+          img.style.opacity = 1;
+        });
+
+        img.width = 50;
+        img.height = 100;
+        return img;
+      };
     </script>
   </body>
 </html>
