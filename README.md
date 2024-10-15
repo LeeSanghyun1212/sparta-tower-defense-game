@@ -23,8 +23,11 @@
 - [Code Convention](https://www.notion.so/teamsparta/Code-Convention-fff2dc3ef5148130a637d194604a8f8a)
 ----
 #### 와이어 프레임
+![image](https://github.com/user-attachments/assets/08725308-a08b-4f58-b45e-b60a9211058e)
+
 ----
 #### 핸들러 명세서
+
 ----
 #### ERD 다이어그램
 ----
