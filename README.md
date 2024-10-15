@@ -27,9 +27,12 @@
 
 ----
 #### 핸들러 명세서
+![image](https://github.com/user-attachments/assets/306c7f50-af03-42a4-b0ba-14958e3aa72e)
 
 ----
 #### ERD 다이어그램
+![image](https://github.com/user-attachments/assets/80959464-9f9d-4fb4-94ff-f92e2cc967c2)
+
 ----
 ### 구현 기능
 - 시간에 따라 스테이지가 진행되고 몬스터를 처치하고 얻은 돈으로 타워를 구매해 기지가 파괴되지 않게 지키는 게임입니다.<br>
