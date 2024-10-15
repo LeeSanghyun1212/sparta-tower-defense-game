@@ -38,6 +38,21 @@
       #tower-buttons {
         display: none; /*타워 버튼을 기본적으로 숨김*/
         margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+      .tower-button {
+        width: 50px;
+        height: 100px;
+        cursor: pointer;
+        transition: filter 0.3s;
+      }
+      .tower-button:hover {
+        filter: brightness(1.2); /* 마우스 오버 시 밝기 증가 */
+      }
+      .tower-button.disabled {
+        filter: grayscale(100%); /* 골드 부족 시 회색으로 변환 */
       }
     </style>
   </head>
@@ -54,15 +69,49 @@
       <button id="upgradeTowerButton">타워 업그레이드</button>
     </div>
     <div id="tower-buttons">
-      <button id="pawnTowerButton">Pawn Tower</button>
-      <button id="rookTowerButton">Rook Tower</button>
-      <button id="knightTowerButton">Knight Tower</button>
-      <button id="bishopTowerButton">Bishop Tower</button>
-      <button id="queenTowerButton">Queen Tower</button>
-      <button id="kingTowerButton">King Tower</button>
+      <img
+        id="pawnTowerButton"
+        class="tower-button"
+        src="images/tower_pawnTower.png"
+        alt="Pawn Tower"
+      />
+      <img
+        id="rookTowerButton"
+        class="tower-button"
+        src="images/tower_rookTower.png"
+        alt="Rook Tower"
+      />
+      <img
+        id="knightTowerButton"
+        class="tower-button"
+        src="images/tower_knightTower.png"
+        alt="Knight Tower"
+      />
+      <img
+        id="bishopTowerButton"
+        class="tower-button"
+        src="images/tower_bishopTower.png"
+        alt="Bishop Tower"
+      />
+      <img
+        id="queenTowerButton"
+        class="tower-button"
+        src="images/tower_queenTower.png"
+        alt="Queen Tower"
+      />
+      <img
+        id="kingTowerButton"
+        class="tower-button"
+        src="images/tower_kingTower.png"
+        alt="King Tower"
+      />
     </div>
+
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
+      import { Tower } from './src/tower.js';
+      let selectedTower = null;
+
       document.getElementById('registerButton').addEventListener('click', () => {
         window.location.href = 'register.html';
       });
@@ -76,7 +125,14 @@
         document.getElementById('gameCanvas').style.display = 'block';
         document.querySelector('.upgrade-container').style.display = 'block';
         document.getElementById('tower-buttons').style.display = 'block';
-        import('./src/game.js');
+        fetch('./assets/tower.json')
+          .then((response) => response.json())
+          .then((data) => {
+            Tower.loadTowerData(data.data);
+            console.log('Loaded tower data:', Tower.towerData);
+            import('./src/game.js');
+          })
+          .catch((error) => console.error('Error loading tower data:', error));
       });
 
       // 업그레이드 버튼 클릭 이벤트 처리
@@ -102,60 +158,32 @@
 
         img.addEventListener('dragstart', (event) => {
           event.dataTransfer.setData('text/plain', towerType); // 타워 타입 저장
+          img.style.opacity = 0.5;
+        });
+        img.addEventListener('dragend', () => {
+          img.style.opacity = 1;
         });
 
-        img.width = 78;
-        img.height = 150;
+        img.width = 50;
+        img.height = 100;
 
         return img;
       };
 
       // 타워 버튼 클릭 시 드래그 가능한 이미지 생성
-      document.getElementById('pawnTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('pawn');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('rookTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('rook');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('knightTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('knight');
-        document.body.appendChild(img);
-      });
-
-      document.getElementById('bishopTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('bishop');
-        document.body.appendChild(img);
-      });
-      document.getElementById('queenTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('queen');
-        document.body.appendChild(img);
-      });
-      document.getElementById('kingTowerButton').addEventListener('click', () => {
-        const img = createDraggableImage('king');
-        document.body.appendChild(img);
-      });
-
-      // 드래그 앤 드롭 수행
-      const canvas = document.getElementById('gameCanvas');
-      canvas.addEventListener('dragover', (event) => {
-        event.preventDefault(); // 기본 동작 방지
-      });
-
-      canvas.addEventListener('drop', (event) => {
-        event.preventDefault();
-        const towerType = event.dataTransfer.getData('text/plain');
-        const { offsetX, offsetY } = event;
-
-        // 타워가 경로 위에 놓이지 않도록 검사
-        if (isPositionValid(offsetX, offsetY)) {
-          placeNewTower(towerType, offsetX, offsetY); // 타워 배치
-        } else {
-          alert('경로 위에는 타워를 배치할 수 없습니다!');
-        }
+      const towerButtons = [
+        'pawnTower',
+        'rookTower',
+        'knightTower',
+        'bishopTower',
+        'queenTower',
+        'kingTower',
+      ];
+      towerButtons.forEach((towerType) => {
+        document.getElementById(`${towerType}Button`).addEventListener('click', () => {
+          const img = createDraggableImage(towerType);
+          document.body.appendChild(img);
+        });
       });
     </script>
   </body>
