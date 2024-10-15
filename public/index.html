@@ -38,6 +38,21 @@
       #tower-buttons {
         display: none; /*타워 버튼을 기본적으로 숨김*/
         margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+      .tower-button {
+        width: 78px;
+        height: 150px;
+        cursor: pointer;
+        transition: filter 0.3s;
+      }
+      .tower-button:hover {
+        filter: brightness(1.2); /* 마우스 오버 시 밝기 증가 */
+      }
+      .tower-button.disabled {
+        filter: grayscale(100%); /* 골드 부족 시 회색으로 변환 */
       }
     </style>
   </head>
@@ -54,13 +69,44 @@
       <button id="upgradeTowerButton">타워 업그레이드</button>
     </div>
     <div id="tower-buttons">
-      <button id="pawnTowerButton">Pawn Tower</button>
-      <button id="rookTowerButton">Rook Tower</button>
-      <button id="knightTowerButton">Knight Tower</button>
-      <button id="bishopTowerButton">Bishop Tower</button>
-      <button id="queenTowerButton">Queen Tower</button>
-      <button id="kingTowerButton">King Tower</button>
+      <img
+        id="pawnTowerButton"
+        class="tower-button"
+        src="images/tower_pawnTower.png"
+        alt="Pawn Tower"
+      />
+      <img
+        id="rookTowerButton"
+        class="tower-button"
+        src="images/tower_rookTower.png"
+        alt="Rook Tower"
+      />
+      <img
+        id="knightTowerButton"
+        class="tower-button"
+        src="images/tower_knightTower.png"
+        alt="Knight Tower"
+      />
+      <img
+        id="bishopTowerButton"
+        class="tower-button"
+        src="images/tower_bishopTower.png"
+        alt="Bishop Tower"
+      />
+      <img
+        id="queenTowerButton"
+        class="tower-button"
+        src="images/tower_queenTower.png"
+        alt="Queen Tower"
+      />
+      <img
+        id="kingTowerButton"
+        class="tower-button"
+        src="images/tower_kingTower.png"
+        alt="King Tower"
+      />
     </div>
+
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
       import { Tower } from './src/tower.js';
