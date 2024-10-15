@@ -1,13 +1,12 @@
 import { sendEvent } from './Socket.js';
 
-class Score {
-  score = 0;
-  scoreIncrement = 0;
-  highScore = 0;
+class Time {
+  time = 0;
+  timeIncrement = 0;
   currentStage = 100; // 현재 스테이지 ID
   stageChanged = {}; // 스테이지 변경 확인용 플래그
 
-  constructor(ctx, scaleRatio, stageTable, itemTable, itemController) {
+  constructor(ctx, scaleRatio, stageTable) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.scaleRatio = scaleRatio;
@@ -24,12 +23,12 @@ class Score {
     const scorePerSecond = currentStageInfo ? currentStageInfo.scorePerSecond : 1;
 
     // 증가분을 누적
-    this.scoreIncrement += deltaTime * 0.001 * scorePerSecond;
+    this.timeIncrement += deltaTime * 0.001 * scorePerSecond;
 
     // 증가분이 scorePerSecond 만큼 쌓이면 score에 반영하고 초기화
-    if (this.scoreIncrement >= scorePerSecond) {
-      this.score += scorePerSecond;
-      this.scoreIncrement -= scorePerSecond;
+    if (this.timeIncrement >= scorePerSecond) {
+      this.time += scorePerSecond;
+      this.timeIncrement -= scorePerSecond;
     }
 
     this.checkStageChange();
@@ -41,7 +40,7 @@ class Score {
 
       // 현재 점수가 스테이지 점수 이상이고, 해당 스테이지로 변경된 적이 없는 경우
       if (
-        Math.floor(this.score) >= stage.timescore &&
+        Math.floor(this.time) >= stage.timescore &&
         !this.stageChanged[stage.id] &&
         stage.id !== 100
       ) {
@@ -62,8 +61,8 @@ class Score {
   }
 
   reset() {
-    this.score = 0;
-    this.scoreIncrement = 0;
+    this.time = 0;
+    this.timeIncrement = 0;
     this.currentStage = 100; // 스테이지 초기화
 
     // 모든 스테이지에 대한 변경 플래그 초기화
@@ -71,10 +70,6 @@ class Score {
       this.stageChanged[key] = false;
     });
 
-  }
-
-  setHighScore(score) {
-    this.highScore = score;
   }
 
   draw() {
@@ -110,4 +105,4 @@ class Score {
   }
 }
 
-export default Score;
+export default Time;

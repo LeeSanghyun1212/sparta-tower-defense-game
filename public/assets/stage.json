@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "data": [
       { "id":  100, "timescore": 0, "scorepersecond": 1},
-      { "id":  101, "timescore": 30, "scorepersecond": 1},
-      { "id":  102, "timescore": 60, "scorepersecond": 1},
-      { "id":  103, "timescore": 90, "scorepersecond": 1},
-      { "id":  104, "timescore": 120, "scorepersecond": 1},
-      { "id":  105, "timescore": 150, "scorepersecond": 1},
-      { "id":  106, "timescore": 180, "scorepersecond": 1}
+      { "id":  101, "timescore": 60, "scorepersecond": 1},
+      { "id":  102, "timescore": 120, "scorepersecond": 1},
+      { "id":  103, "timescore": 180, "scorepersecond": 1},
+      { "id":  104, "timescore": 240, "scorepersecond": 1},
+      { "id":  105, "timescore": 300, "scorepersecond": 1},
+      { "id":  106, "timescore": 360, "scorepersecond": 1}
     ]
   }
