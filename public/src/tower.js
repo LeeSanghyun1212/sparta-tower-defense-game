@@ -101,8 +101,8 @@ export class Tower {
 
 //사거리 짧은 단일 공격 타워
 export class pawnTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 50; //업그레이드 비용
   }
 }
@@ -110,7 +110,7 @@ export class pawnTower extends Tower {
 //사거리 긴 단일 공격 타워
 export class rookTower extends Tower {
   constructor(x, y, towerType) {
-    super(x, y, towerTower);
+    super(x, y, towerType);
     this.upgradeCost = 50; // 업그레이드 비용
   }
 }
@@ -216,8 +216,8 @@ export class bishopTower extends Tower {
 
 //가까이오면 죽을때까지 때리는 타워
 export class queenTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 150; // 업그레이드 비용
   }
 
@@ -230,8 +230,8 @@ export class queenTower extends Tower {
 }
 
 export class kingTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 150; // 업그레이드 비용
   }
 
