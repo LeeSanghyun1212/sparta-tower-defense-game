@@ -23,15 +23,15 @@ export class Monster {
     }
     this.maxHp = monsterData.hp + 10 * level; // 몬스터의 현재 HP
     this.hp = this.maxHp; // 몬스터의 현재 HP
-    this.attackPower = monsterData.attackPower + level; // 몬스터의 공격력 (기지에 가해지는 데미지)
+    this.attackPower = monsterData.attack_power * level ; // 몬스터의 공격력 (기지에 가해지는 데미지)
     this.speed = monsterData.speed;
     this.width = monsterData.width; // 몬스터 이미지 가로 길이
     this.height = monsterData.height; // 몬스터 이미지 세로 길이
     this.image = monsterImages[monsterData.imageIndex]; // 몬스터 이미지
-    this.score = 10 * (1 + level);
+    this.score = monsterData.score;
   }
 
-  move(stageLevel, base) {
+  move(base) {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -49,7 +49,7 @@ export class Monster {
       }
       return false;
     } else {
-      const isDestroyed = base.takeDamage(stageLevel, this.attackPower); // 기지에 도달하면 기지에 데미지를 입힙니다! 기지의 체력이 0이하이면 true 반환으로 패배 아니면 정상진행
+      const isDestroyed = base.takeDamage(this.attackPower); // 기지에 도달하면 기지에 데미지를 입힙니다! 기지의 체력이 0이하이면 true 반환으로 패배 아니면 정상진행
       this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
       return isDestroyed;
     }

@@ -18,6 +18,7 @@ export const getUsers = () => {
 
 export const getUser = (userId) => {
   const user = users.find((user) => user.userId === userId);
-
   return user;
 };
+
+

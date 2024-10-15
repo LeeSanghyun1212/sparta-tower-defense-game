@@ -3,6 +3,8 @@ import fs from 'fs';
 import { createServer } from 'http';
 import { loadServerGameAssets } from './src/init/asset.js';
 import initSocket from './src/init/socket.js';
+import usersRouter from './src/route/accout.router.js';
+
 
 const app = express();
 const server = createServer(app);
@@ -12,6 +14,7 @@ const PORT = 3000;
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/api', usersRouter);
 initSocket(server);
 
 server.listen(PORT, async () => {

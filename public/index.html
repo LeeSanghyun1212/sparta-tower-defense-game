@@ -44,6 +44,7 @@
   <body>
     <div class="button-container">
       <h1 style="color: white">내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
+      <h2 id="nickname" style="color: white;"></h2>
       <button id="registerButton">회원가입</button>
       <button id="loginButton">로그인</button>
       <button id="playButton">게임 플레이</button>
@@ -63,6 +64,21 @@
     </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script type="module">
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+
+      // 페이지가 로드되면 닉네임 표시하기
+      document.addEventListener('DOMContentLoaded', () => {
+        const nickname = getCookie('nickname'); // 쿠키에서 닉네임 가져오기
+        if (nickname) {
+          document.getElementById('nickname').textContent = `안녕하세요, ${nickname}님!`; // 닉네임 표시
+        } else {
+          document.getElementById('nickname').textContent = `로그인이 필요합니다.`;
+        }
+      });
       document.getElementById('registerButton').addEventListener('click', () => {
         window.location.href = 'register.html';
       });
