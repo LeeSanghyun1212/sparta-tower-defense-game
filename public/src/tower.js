@@ -57,7 +57,7 @@ export class Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
       ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;
       ctx.stroke();
@@ -160,7 +160,7 @@ export class knightTower extends Tower {
       this.targets.forEach((target) => {
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(target.x + target.width / 2, target.y + target.height / 2);
+        ctx.lineTo(target.x + target.width / 2, target.y);
         ctx.strokeStyle = 'yellow';
         ctx.lineWidth = 10;
         ctx.stroke();
@@ -204,7 +204,7 @@ export class bishopTower extends Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y); // 타워 위치에서 시작
-      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2); // 몬스터 위치로 광선
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
       ctx.strokeStyle = 'green';
       ctx.lineWidth = 10;
       ctx.stroke();
@@ -218,13 +218,49 @@ export class bishopTower extends Tower {
 export class queenTower extends Tower {
   constructor(x, y, towerType) {
     super(x, y, towerType);
-    this.upgradeCost = 150; // 업그레이드 비용
+    this.upgradeCost = 50; // 업그레이드 비용
+    this.startAttackPower = this.attackPower; // 첫 공격 시작 시의 공격력
+    this.frameCounting = 0;
+    console.log(this.frameCounting);
   }
 
   attack(monster) {
-    if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower; // 공격
-      this.cooldown = 60; // 1초마다 공격
+    // target이 없다면 공격을 시작한다.
+    const targetMonster = this.target ? this.target : null;
+    if (!targetMonster) {
+      this.target = monster;
+    }
+  }
+
+  draw(ctx, towerImages) {
+    ctx.drawImage(
+      towerImages[`${this.type}`],
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height,
+    );
+    if (this.target) {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.closePath();
+
+      this.frameCounting += 1;
+
+      if (this.frameCounting === 30) {
+        this.target.hp -= this.startAttackPower;
+        this.startAttackPower += 1;
+        this.frameCounting = 0;
+      }
+
+      if (this.target.hp <= 0) {
+        this.target = null;
+        this.startAttackPower = this.attackPower;
+      }
     }
   }
 }
