@@ -78,7 +78,6 @@ router.post("/login", async (req, res) => {
 
     // 3) jwt 토큰 생성
     const token = jwt.sign({ loginId: account.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log('로그인시 토큰',token);
     res.cookie("authorization", `Bearer ${token}`, { maxAge: 10000 });
     res.cookie('nickname', account.nickname,{ maxAge: 10000,});
     return res.status(200).json({ message: "로그인에 성공했습니다." });

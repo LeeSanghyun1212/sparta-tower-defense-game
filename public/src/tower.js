@@ -5,8 +5,6 @@ export class Tower {
   static towerData = [];
 
   static loadTowerData(data) {
-    console.log('Loaded tower data:', Tower.towerData);
-
     this.towerData = data;
   }
 
@@ -101,8 +99,8 @@ export class Tower {
 
 //사거리 짧은 단일 공격 타워
 export class pawnTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 50; //업그레이드 비용
   }
 }
@@ -110,7 +108,7 @@ export class pawnTower extends Tower {
 //사거리 긴 단일 공격 타워
 export class rookTower extends Tower {
   constructor(x, y, towerType) {
-    super(x, y, towerTower);
+    super(x, y, towerType);
     this.upgradeCost = 50; // 업그레이드 비용
   }
 }
