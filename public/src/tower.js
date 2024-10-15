@@ -201,7 +201,7 @@ export class bishopTower extends Tower {
       this.width,
       this.height,
     );
-    if (this.beamDuration > 0 && this.targets) {
+    if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y); // 타워 위치에서 시작
       ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2); // 몬스터 위치로 광선
