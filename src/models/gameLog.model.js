@@ -1,12 +1,11 @@
 import { prisma } from '../utils/prisma/index.js';
-import { getUser } from '../models/user.model.js';
 
 export const createGameLog = async ({ userId, score }) => {
   try {
     const newGameLog = await prisma.gameLog.create({
       data: {
         userId: userId, // 올바르게 userId를 사용
-        score: score,   // 올바르게 score를 사용
+        score: score, // 올바르게 score를 사용
       },
     });
     return newGameLog; // 생성된 게임 로그 반환
@@ -16,18 +15,23 @@ export const createGameLog = async ({ userId, score }) => {
   }
 };
 
-export const updateGameLog = async (userId, score) => {
+export const updateGameLog = async (gameLogId, score) => {
   try {
-      const user = await getUser(userId); 
-      if (user && score > user.highScore) { 
-          await prisma.user.update({
-              where: { id: userId },
-              data: { highScore: score },
-          });
-          console.log(`User ${userId}의 최고 점수가 ${score}로 업데이트되었습니다.`);
-      }
+    const updatescore= score.score; 
+    const updateplaydeAt = score.playedAt
+    const gameLog = await prisma.gameLog.findUnique({
+      where: {
+        id: gameLogId,
+      },
+    });
+    if (updatescore > gameLog.score) {
+      await prisma.gameLog.update({
+        where: { id: gameLogId  },
+        data: { score: updatescore, playedAt: updateplaydeAt },
+      });
+    }
   } catch (error) {
-      console.error('Failed to update game log:', error);
+    console.error('Failed to update game log:', error);
   }
 };
 

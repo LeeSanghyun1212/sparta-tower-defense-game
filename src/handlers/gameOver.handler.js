@@ -5,15 +5,13 @@ import { createGameLog, updateGameLog, getUserGameLog } from '../models/gameLog.
 /** 게임 오버에 대한 핸들러 **/
 export const gameOver = async (userId, payload) => {
   const { score, highscore } = payload; // payload에서 score를 가져옴
-  console.log('test', userId, score, highscore);
-
   const userGameLog = await getUserGameLog(userId);
 
   if (!userGameLog) {
     // 만약 사용자의 게임 로그가 없으면 새로 생성
-    const newGameLog = await createGameLog({
+    await createGameLog({
       userId: userId,
-      score: highscore,
+      score: score,
     });
     console.log(`새로운 게임 로그가 생성되었습니다. 사용자 ID: ${userId}, 점수: ${highscore}`);
   } else {
@@ -30,9 +28,6 @@ export const gameOver = async (userId, payload) => {
       console.log(`점수가 낮아 기록하지 않음: 현재 점수 ${score}, 이전 하이스코어 ${previousHighScore}`);
     }
   }
-
-  // 사용자에게 게임 오버 메시지 전송
-  console.log(userId, `게임이 종료되었습니다. 점수: ${score}`);
 
   // 클라이언트에 게임 오버 상태 반환
   return {

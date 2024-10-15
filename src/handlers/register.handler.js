@@ -25,7 +25,6 @@ const registerHandler = (io) => {
         }; //인증된 사용자의 상태를 저장
       });
       const userId = socket.data.user_id;
-      console.log('접속한 userID : ', socket.data.user_id);
       if (!userId) {
         throw new Error('Auth Not Found');
       }
