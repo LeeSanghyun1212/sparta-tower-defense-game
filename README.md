@@ -27,7 +27,7 @@
 
 ----
 #### 핸들러 명세서
-![image](https://github.com/user-attachments/assets/306c7f50-af03-42a4-b0ba-14958e3aa72e)
+![image](https://github.com/user-attachments/assets/3bcbb55d-6ae7-4553-a0be-77c1b0541062)
 
 ----
 #### ERD 다이어그램
