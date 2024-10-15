@@ -388,7 +388,6 @@ function initStageData(data) {
   }
   monsterId = stageData.monster_id;
   monsterSpawnInterval = stageData.monster_spawn_interval;
-  console.log(monsterSpawnInterval);
   goalTimestamp = stageData.timestamp;
   stageChange = true;
 }
