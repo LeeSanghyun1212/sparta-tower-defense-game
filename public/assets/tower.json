@@ -44,8 +44,8 @@
       "attack_power": 10,
       "range": 300,
       "cost": 130,
-      "cooldown": 60,
-      "beamDuration": 30,
+      "cooldown": 300,
+      "beamDuration": 60,
       "upgradeCost": 50,
       "width": 50,
       "height": 100
