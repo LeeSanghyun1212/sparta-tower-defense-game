@@ -344,6 +344,10 @@ function gameLoop() {
         monsterScore: monster.score,
       });
       monsters.splice(i, 1);
+      score += monster.score;
+      if (score >= highScore) {
+        highScore = score;
+      }
 
       if (score > highScore) {
         highScore = score;
