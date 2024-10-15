@@ -55,7 +55,7 @@ export class Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
       ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;
       ctx.stroke();
@@ -79,22 +79,24 @@ export class Tower {
     }
   }
 
-  upgrade() {
-    if (!this.towerLevel) {
-      this.towerLevel = 1;
-    }
-    if (this.towerLevel < 3) {
-      this.towerLevel++;
-      if (this.towerLevel === 2) {
-        this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
-        this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
-      } else if (this.towerLevel === 3) {
-        this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
-        this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
-      }
-      this.upgradeCost += 20; // 업그레이드 비용 증가
-    }
-  }
+  // upgrade() {
+  //   if (!this.towerLevel) {
+  //     this.towerLevel = 1;
+  //   }
+  //   if (this.towerLevel < 3) {
+  //     this.towerLevel++;
+  //     if (this.towerLevel === 2) {
+  //       this.attackPower += 10; // 1레벨에서 2레벨로 업그레이드 시 공격력 증가
+  //       this.range += 30; // 1레벨에서 2레벨로 업그레이드 시 사거리 증가
+  //     } else if (this.towerLevel === 3) {
+  //       this.attackPower += 50; // 2레벨에서 3레벨로 업그레이드 시 공격력 증가
+  //       this.range += 50; // 2레벨에서 3레벨로 업그레이드 시 사거리 증가
+  //     }
+  //     this.upgradeCost += 20; // 업그레이드 비용 증가
+  //   } else {
+  //     console.log('최대 레벨에 도달했습니다.'); // 최대 레벨 도달 메시지
+  //   }
+  // }
 }
 
 //사거리 짧은 단일 공격 타워
@@ -158,7 +160,7 @@ export class knightTower extends Tower {
       this.targets.forEach((target) => {
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(target.x + target.width / 2, target.y + target.height / 2);
+        ctx.lineTo(target.x + target.width / 2, target.y);
         ctx.strokeStyle = 'yellow';
         ctx.lineWidth = 10;
         ctx.stroke();
@@ -202,7 +204,7 @@ export class bishopTower extends Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x, this.y); // 타워 위치에서 시작
-      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2); // 몬스터 위치로 광선
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
       ctx.strokeStyle = 'green';
       ctx.lineWidth = 10;
       ctx.stroke();
@@ -214,22 +216,58 @@ export class bishopTower extends Tower {
 
 //가까이오면 죽을때까지 때리는 타워
 export class queenTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
-    this.upgradeCost = 150; // 업그레이드 비용
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
+    this.upgradeCost = 50; // 업그레이드 비용
+    this.startAttackPower = this.attackPower; // 첫 공격 시작 시의 공격력
+    this.frameCounting = 0;
+    console.log(this.frameCounting);
   }
 
   attack(monster) {
-    if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower; // 공격
-      this.cooldown = 60; // 1초마다 공격
+    // target이 없다면 공격을 시작한다.
+    const targetMonster = this.target ? this.target : null;
+    if (!targetMonster) {
+      this.target = monster;
+    }
+  }
+
+  draw(ctx, towerImages) {
+    ctx.drawImage(
+      towerImages[`${this.type}`],
+      this.x - this.width / 2,
+      this.y - this.height / 2,
+      this.width,
+      this.height,
+    );
+    if (this.target) {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.closePath();
+
+      this.frameCounting += 1;
+
+      if (this.frameCounting === 10) {
+        this.target.hp -= this.startAttackPower;
+        this.startAttackPower += 1;
+        this.frameCounting = 0;
+      }
+
+      if (this.target.hp <= 0) {
+        this.target = null;
+        this.startAttackPower = this.attackPower;
+      }
     }
   }
 }
 
 export class kingTower extends Tower {
-  constructor(x, y, towerTower) {
-    super(x, y, towerTower);
+  constructor(x, y, towerType) {
+    super(x, y, towerType);
     this.upgradeCost = 150; // 업그레이드 비용
   }
 

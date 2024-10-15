@@ -1,6 +1,6 @@
 import { Base } from './base.js';
 import { CLIENT_VERSION } from './constant.js';
-import { stageDataTable } from './init/asset.js';
+import { stageDataTable, towerDataTable } from './init/asset.js';
 import { Monster } from './monster.js';
 import { sendEvent, sendGameStartEvent } from './socket.js';
 import {
@@ -40,6 +40,8 @@ const towers = [];
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let isSellTower = false; //타워판매
+let isUpgradeTower = false; //타워업글
 
 // 타워 이미지 배열 추가
 const towerImages = {
@@ -230,47 +232,8 @@ function placeNewTower(towerType, x, y) {
     alert('골드가 부족합니다!');
     return;
   }
-
-  userGold -= towerData.cost;
-  let tower = null;
-  switch (towerData.type) {
-    case 'pawnTower':
-      {
-        tower = new pawnTower(x, y, towerData.type);
-      }
-      break;
-    case 'rookTower':
-      {
-        tower = new rookTower(x, y, towerData.type);
-      }
-      break;
-    case 'knightTower':
-      {
-        tower = new knightTower(x, y, towerData.type);
-      }
-      break;
-    case 'bishopTower':
-      {
-        tower = new bishopTower(x, y, towerData.type);
-      }
-      break;
-    case 'queenTower':
-      {
-        tower = new queenTower(x, y, towerData.type);
-      }
-      break;
-    case 'kingTower':
-      {
-        tower = new kingTower(x, y, towerData.type);
-      }
-      break;
-    default: {
-      console.log('Unknown Tower Type : ', towerData.type);
-    }
-  }
-
-  towers.push(tower);
-  tower.draw(ctx, towerImages);
+  const payload = { userGold, towerId: towerData.id, x, y };
+  sendEvent(userId, 22, payload);
 }
 
 function placeBase() {
@@ -398,7 +361,6 @@ function gameLoop() {
       });
       monsters.splice(i, 1);
       score += monster.score;
-      userGold += monster.gold;
       if (score >= highScore) {
         highScore = score;
       }
@@ -513,9 +475,100 @@ Promise.all([
               initStageData(data.stageId);
               break;
             }
+          case 22:
+            {
+              userGold = data.userGold;
+
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              let tower = null;
+              switch (towerData.type) {
+                case 'pawnTower':
+                  {
+                    tower = new pawnTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'rookTower':
+                  {
+                    tower = new rookTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'knightTower':
+                  {
+                    tower = new knightTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'bishopTower':
+                  {
+                    tower = new bishopTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'queenTower':
+                  {
+                    tower = new queenTower(x, y, towerData.type);
+                  }
+                  break;
+                case 'kingTower':
+                  {
+                    tower = new kingTower(x, y, towerData.type);
+                  }
+                  break;
+                default: {
+                  console.log('Unknown Tower Type : ', towerData.type);
+                }
+              }
+              towers.push(tower);
+              tower.draw(ctx, towerImages);
+            }
+            break;
+          case 23: // 타워 판매 응답
+            {
+              // 유저 골드 서버로부터 동기화
+              userGold = data.userGold;
+
+              // 해당 towerId를 가진 타워의 타입을 가져오자.
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              const towerIndex = towers.findIndex((tower) => {
+                return tower.x === x && tower.y === y && tower.type === towerData.type;
+              });
+
+              towers.splice(towerIndex, 1);
+            }
+            break;
+          case 24: // 타워 업그레이드 응답
+            {
+              userGold = data.userGold;
+
+              const towerData = towerDataTable.data.find((tower) => tower.id === data.towerId);
+              const x = data.x;
+              const y = data.y;
+
+              const towerIndex = towers.findIndex((tower) => {
+                return tower.x === x && tower.y === y && tower.type === towerData.type;
+              });
+
+              if (towerIndex !== -1) {
+                towers[towerIndex].level += 1;
+
+                const upgradedTower = towers[towerIndex];
+                upgradedTower.attackPower = towerData.attackPower;
+                upgradedTower.range = towerData.range;
+
+                upgradedTower.draw(ctx, towerImages);
+              } else {
+                console.log('업그레이드된 타워를 찾을 수 없습니다.');
+              }
+            }
+            break;
           case 31:
             {
               score = data.score;
+              userGold = data.userGold;
             }
             break;
           case 32:
@@ -537,4 +590,60 @@ Promise.all([
       }
     });
   }
+});
+// 마우스 클릭 위치에서 가장 가까운 타워를 얻어오는 함수
+// 단, maxDistance의 밖의 타워는 찾지 않는다.
+function findNearTower(x, y) {
+  let selectTower = null;
+  const maxDistance = 50;
+  let minDistance = 100;
+
+  towers.forEach((tower) => {
+    const distance = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
+    if (distance < maxDistance) {
+      if (distance < minDistance) {
+        minDistance = distance;
+        selectTower = tower;
+      }
+    }
+  });
+
+  return selectTower;
+}
+
+function clickEvent(event) {
+  const dx = event.clientX - ctx.canvas.offsetLeft;
+  const dy = event.clientY - ctx.canvas.offsetTop;
+
+  if (isSellTower) {
+    const selectTower = findNearTower(dx, dy);
+    if (!selectTower) return;
+
+    const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
+    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    sendEvent(userId, 23, payload);
+  }
+
+  if (isUpgradeTower) {
+    const selectTower = findNearTower(dx, dy);
+    if (!selectTower) return;
+
+    const towerData = towerDataTable.data.find((tower) => tower.type === selectTower.type);
+    const payload = { towerId: towerData.id, x: selectTower.x, y: selectTower.y };
+    sendEvent(userId, 24, payload);
+  }
+}
+
+canvas.addEventListener('click', clickEvent);
+
+const sellButton = document.getElementById('sellTowerButton');
+
+sellButton.addEventListener('click', () => {
+  isSellTower = true;
+});
+
+const upgradeButton = document.getElementById('upgradeTowerButton');
+
+upgradeButton.addEventListener('click', () => {
+  isUpgradeTower = true;
 });
