@@ -38,19 +38,40 @@
     <div class="form-container">
       <h1>내일배움캠프 Node.js 트랙 타워 디펜스 게임</h1>
       <h2>회원가입</h2>
-      <input type="text" id="username" placeholder="아이디" />
+      <input type="text" id="loginId" placeholder="아이디" />
       <input type="password" id="password" placeholder="비밀번호" />
+      <input type="password" id="checkpassword" placeholder="비밀번호 확인" />
+      <input type="text" id="nickname" placeholder="닉네임" />
       <button id="register">회원가입</button>
       <button id="back">뒤로가기</button>
     </div>
     <script>
-      document.getElementById('register').addEventListener('click', () => {
-        const username = document.getElementById('username').value;
+      document.getElementById('register').addEventListener('click', async () => {
+        const loginId = document.getElementById('loginId').value;
         const password = document.getElementById('password').value;
-        
-        /* 
+        const checkpassword = document.getElementById('checkpassword').value;
+        const nickname = document.getElementById('nickname').value;
+
+        try {
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ loginId, password, checkpassword, nickname }),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.errorMessage || '회원가입 실패');
+          }
+          alert(data.message);
+          window.location.href = 'index.html';
+        /*
           회원가입 API 호출 후 회원가입 성공 시 index.html로 이동시켜주세요!
         */
+        } catch (error) {
+          alert(error.message);
+        }
       });
 
       document.getElementById('back').addEventListener('click', () => {

@@ -32,7 +32,6 @@ export class Monster {
     this.image = monsterImages[monsterData.imageIndex]; // 몬스터 이미지
     this.score = monsterData.score + level * 10;
   }
-
   move() {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
@@ -50,8 +49,7 @@ export class Monster {
         this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
       }
       return false;
-    } else {
-      
+    } else {    
       let isAttacked = true;
       return isAttacked;
     }

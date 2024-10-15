@@ -5,10 +5,8 @@ import { Monster } from './monster.js';
 import { sendEvent, sendGameStartEvent } from './socket.js';
 import { Tower } from './tower.js';
 
-/* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
-const userId = 1;
+let userId;
+let isConnectionHandled = false;
 
 export let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
@@ -33,7 +31,7 @@ const monsters = [];
 const towers = [];
 
 let score = 0; // 게임 점수
-let highScore = 10000; // 기존 최고 점수
+let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
 // 타워 이미지 배열 추가
@@ -264,6 +262,10 @@ function spawnMonster() {
 }
 
 function gameLoop() {
+  if (checkGameOver()) {
+    return;
+  }
+
   // 스테이지 경과 시간 text로 출력
   timestamp = Date.now();
   const deltaTime = (timestamp - startTimestamp) / 1000;
@@ -320,13 +322,16 @@ function gameLoop() {
         });
         monsters.splice(i, 1);
       }
-
       const isDestroyed = base.destroyed();
       if (isDestroyed) {
+        sendEvent(userId, 12, {
+          score: score,
+          highscore: highScore,
+        });
         /* 게임 오버 */
         monsters.splice(0);
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        location.reload();
+        //location.reload();
       }
 
       monster.draw(ctx);
@@ -339,10 +344,26 @@ function gameLoop() {
         monsterScore: monster.score,
       });
       monsters.splice(i, 1);
+
+      if (score > highScore) {
+        highScore = score;
+      }
     }
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
+}
+
+function checkGameOver() {
+  if (baseHp <= 0) {
+    console.log('사망');
+    sendEvent(userId, 32, {
+      stageLevel: stageId,
+      monsterNumber: monster.monsterNumber,
+      monsterLevel: monster.level,
+      monsterScore: monster.score,
+    });
+  }
 }
 
 function initStageData(data) {
@@ -363,7 +384,6 @@ function initGameData(data) {
   userGold = data.userGold; // 유저 골드
   baseHp = data.baseHp; // 기지 체력
   numOfInitialTowers = data.numOfInitialTowers; // 초기 타워 개수
-
   score = data.score; // 게임 점수
 }
 
@@ -371,18 +391,23 @@ export function initGame() {
   if (isInitGame) {
     return;
   }
-
+  
   //monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   monsterPath = generateCustomMonsterPath();
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
-
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
-
+// 쿠키에서 토큰 가져오기
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -392,36 +417,48 @@ Promise.all([
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   // let somewhere;
-  serverSocket = io('http://localhost:3000', {
-    query: {
-      clientVersion: CLIENT_VERSION,
-    },
-    auth: {
-      userId: userId,
-    },
-  });
+  const token = getCookie('authorization');
+  const decodedToken = token ? decodeURIComponent(token) : null;
 
-  serverSocket.on('connection', (data) => {
-    console.log('connection Complete');
-    startTimestamp = Date.now();
-    sendGameStartEvent(userId, 11, startTimestamp);
-  });
+  if (!token) {
+    alert('로그인이 필요합니다');
+    window.location.href = 'login.html';
+  } else {
+    serverSocket = io('http://localhost:3000', {
+      query: {
+        clientVersion: CLIENT_VERSION,
+      },
+      auth: {
+        userId: userId,
+        token: decodedToken,
+      },
+    });
+    serverSocket.on('connection', (data) => {
+      if (!isConnectionHandled) {
+        console.log('connection Complete');
+        startTimestamp = Date.now();
+        userId = data.userId;
+        sendEvent(userId, 41);
+        sendGameStartEvent(userId, 11, startTimestamp);
+        isConnectionHandled = true;
+        
+      }
+    });
+    serverSocket.on('response', (data) => {
+      console.log(data);
 
-  serverSocket.on('response', (data) => {
-    console.log(data);
-
-    try {
-      switch (data.handlerId) {
-        case 11:
-          {
-            if (!isInitGame) {
-              initGameData(data.initGameData);
-              initStageData(data.stageId);
-              initGame();
+      try {
+        switch (data.handlerId) {
+          case 11:
+            {
+              if (!isInitGame) {
+                initGameData(data.initGameData);
+                initStageData(data.stageId);
+                initGame();
+              }
             }
-          }
-          break;
-        case 31:
+            break;
+          case 31:
           {
             score = data.score;
           }
@@ -430,21 +467,20 @@ Promise.all([
           {
             base.hp = data.baseHp;
           }
-          break;
-        default: {
-          throw new Error(`Unknown Response : ${data.handlerId}`);
+          break; 
+          case 41:
+            {
+              console.log('Payload:', data.highScore);
+              highScore = data.highScore;
+            }
+            break;
+          default: {
+            throw new Error(`Unknown Response : ${data.handlerId}`);
+          }
         }
+      } catch (err) {
+        console.error('Error => ', err.message);
       }
-    } catch (err) {
-      console.error('Error => ', err.message);
-    }
-  });
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
+    });
+  }
 });

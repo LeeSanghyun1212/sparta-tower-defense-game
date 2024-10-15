@@ -28,7 +28,7 @@ export class Base {
       this.y - this.height / 2 - 10,
     );
   }
-
+  
   destroyed() {
     // 기지가 파괴되었는지를 구분하는 메소드입니다.
     // 몬스터가 기지의 HP를 감소시키고, HP가 0 이하가 되면 게임 오버 처리를 해요!
